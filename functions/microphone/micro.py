@@ -26,13 +26,13 @@ def recognize_speech():
                 speak("Xin lỗi, tôi không thể nhận dạng được âm thanh.")
                 return None
             except sr.RequestError as e:
-                speak(f"Không thể kết nối đến dịch vụ nhận dạng: {e}")
+                speak(f"Không thể kết nối đến microphone: {e}")
                 return None
         except sr.UnknownValueError:
             speak("Xin lỗi, tôi không thể nhận dạng được âm thanh.")
             return None
         except sr.RequestError as e:
-            speak(f"Không thể kết nối đến dịch vụ nhận dạng: {e}")
+            speak(f"Không thể kết nối đến microphone: {e}")
             return None
 
 if __name__ == "__main__":
