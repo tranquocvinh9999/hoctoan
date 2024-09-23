@@ -1,0 +1,56 @@
+Học toán cho người khiếm thính: 
+   + Lựa chọn nói và nhập bàn phím
+   + Nói thì phải mỗi lần nói xong phải hỏi lại ( kể cả câu đã nói )
+   + Gõ Phím nói lên chữ 
+   + Dùng AI kiểm tra toán
+   + Đăng ký tài khoản mật khẩu rồi gửi lên server
+   + Thiết kế frontend ( dùng ui python )
+   + API SERVER 
+     - Lấy thông tin về số người online
+     - Lấy số liệu về bảng xếp hạng
+     - Lưu trữ thông tin về những bài học ngắn 
+     - Xử lý dữ liệu về thông tin khi đăng nhập
+     - Khi có 2 người đấu với nhau 
+       + Cơ chế giống quizz (cho 2 client nhận về 1 cái information về 1 câu hỏi)
+       + Dùng AI để giải mã 2 câu hỏi rồi cho nó đọc lên
+       + Khi trả lời xong thì check đáp án (POINT)
+       + Nếu đúng thì nộp lên + thời gian nhập hoặc thời gian nói (dữ liệu để check ai nộp trước nộp sau)
+       + Khi trả lời xong hết câu hỏi thì khi dừng sẽ gửi tổng điểm câu hỏi và câu trả lời lên server
+       + Nếu player bấm vào database thì cho sv respone lại leaderboard.json
+   + Leaderboard (KHI 2 NGƯỜI THI ĐẤU) 
+     - Fetch user từ score r dùng map để sắp xếp
+     - Fetch xong rồi thì cho cút vào Leaderboard.json
+     - Từ Leaderboard.json Cho Phần mềm lấy dữ liệu top
+     - Từ thông tin đã có fetch tất cả những thông tin đã được trả về rồi nói (CHÚC MỪNG BẠN ĐÃ DÀNH ĐƯỢC TOP ??)
+     - Rồi đẩy thông tin leaderboard.json đó và lưu nó lại thành 1 file cũ (d/m/y) rồi ghi lại các dữ liệu sang file mới
+    + HỌC TOÁN
+     - Giảng lý thuyết (các bài theo chương trình cô cho)
+     - Luyện tập sau mỗi bài giảng (10 câu)
+     - Cho AI check
+     - Bài Giảng sẽ được Lưu trong 1 folder data và được định là txt
+     - Đúng Thì sẽ được cộng 1 điểm và rồi lưu điểm đó
+     - Rồi đẩy tất cả đúng sai và điểm lên hệ thống
+     - Sau bài kiểm tra sẽ được chúc mừng bạn được bao nhiêu điểm
+     - YAYYY
+     + AI CORE
+      - Có một database khoảng 100 câu hỏi
+      - Chấm điểm
+      - Truy xuất từng câu hỏi trên database rồi gộp chúng vào 1 bài gồm 10 câu
+
+
+cho giáo viên nhập bài giảng luôn
+- tập trung vào:
+  + chuyển hết từ nhấn 1, 2 sang nói
+++
+API REQUEST FORMAT (ví dụ)
+POST
+<user>=...?
+<anwser>=...?
+<time>=...?
+<point>=...?
+<fail>=...?
+<correct>=..?
+<user>=...?
+
+GET
+<leaderboard>

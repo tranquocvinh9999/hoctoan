@@ -1,0 +1,12 @@
+{
+    "user-1":{
+        "score": 0,
+        "fail": 0,
+        "correct": 0
+    },
+    "user-2":{
+        "score": 0,
+        "fail": 0,
+        "correct": 0
+    }
+}
