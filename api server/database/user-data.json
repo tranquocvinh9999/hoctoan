@@ -1,12 +1,8 @@
 {
-    "user-1":{
-        "score": 0,
-        "fail": 0,
-        "correct": 0
+    "vinh": {
+        "password": "123456"
     },
-    "user-2":{
-        "score": 0,
-        "fail": 0,
-        "correct": 0
+    "khang": {
+        "password": "654321"
     }
 }

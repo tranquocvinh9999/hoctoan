@@ -35,5 +35,15 @@ def recognize_speech():
             speak(f"Không thể kết nối đến microphone: {e}")
             return None
 
-if __name__ == "__main__":
-    recognized_text = recognize_speech()
+
+def check():
+    k = recognize_speech()
+    speak(f"Có phải bạn vừa nói {k} không")
+    speak(f"phải hoặc là không để nói lại")
+    ntn = recognize_speech()
+    if ntn == "phải":
+        return k
+    elif ntn == "không":
+        recognize_speech()
+
+    
