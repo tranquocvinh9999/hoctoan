@@ -1,7 +1,7 @@
 import random
 from functions.keyboard.keyboards import speak
 from AI.functions.math import nhan, cong, tru
-
+# hello
 def random_10_cau_hoi_nhan_cong_tru():
     questions = []
     dem = 0
