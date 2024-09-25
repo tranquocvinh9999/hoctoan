@@ -1,6 +1,6 @@
 {
     "user_score": 0,
-    "valid": 0,
-    "fail": 0,
-    "username": "kk"
+    "user_succes": 0,
+    "user_fail": 0,
+    "user": "kk"
 }

@@ -1,43 +1,57 @@
 from flask import Flask, request, jsonify
 import json
+
 app = Flask(__name__)
-def check_users(thamso):
-    with open("database/user-data.json") as f:
-        settings = json.load(f)
-        if thamso in settings:
-            return True
-        else:
-            return False
-def check_passw(thamso, passs):
+
+def check_user_passw(thamso, pasw):
     with open("database/user-data.json") as f:
         settings = json.load(f)
         if thamso in settings:
             passw = settings[thamso]["password"]
-            if passs == passw:
-                return True
+            if pasw == passw:
+                return True, True 
             else:
-                return False
+                return True, False 
+        else:
+            return False, False  
+
+from flask import Flask, request, jsonify
+import json
+
+app = Flask(__name__)
+
+@app.route('/receive_new_user', methods=['POST'])
+def new():
+    data = request.get_json()
+    if not data or 'pass' not in data or 'user' not in data:
+        return jsonify({'error': 'Invalid request data'}), 400
+    passs = data.get('pass')
+    users = data.get('user')
+    new_data = {
+        f"{users}": {
+            "password": f"{passs}" 
+        }
+    }
+    
+    filepath = "database/user-data.json"
+    with open(filepath, 'w', encoding='utf-8') as file:
+        json.dump(new_data, file, ensure_ascii=False, indent=4)
+    return "ok"
 
 @app.route('/check_user', methods=['POST'])
 def check_user():
     data = request.get_json()
-    user = data.get('user')
-
-    if check_users(user) == True:
-        response = "tài khoản đúng"
-    else:
-        response = "tài khoản sai"
-    return jsonify({'response': response})
-
-@app.route('/check_passw', methods=['POST'])
-def check_user():
-    data = request.get_json()
+    if not data or 'pass' not in data or 'user' not in data:
+        return jsonify({'error': 'Invalid request data'}), 400
     passs = data.get('pass')
     users = data.get('user')
-    if check_users(users, passs) == True:
-        response = "mật khẩu đúng"
-    else:
-        response = "mật khẩu sai"
-    return jsonify({'response': response})
+    user_valid, correct_pass = check_user_passw(users, passs)
+    response = {
+        'isCorrectUser': user_valid,
+        'isCorrectPass': correct_pass if user_valid else False
+    }
+    
+    return jsonify(response)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)  

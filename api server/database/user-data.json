@@ -1,8 +1,5 @@
 {
-    "vinh": {
-        "password": "123456"
-    },
-    "khang": {
-        "password": "654321"
+    "vinhdeptrai": {
+        "password": "vinh"
     }
 }
