@@ -48,7 +48,8 @@ def check_user():
     user_valid, correct_pass = check_user_passw(users, passs)
     response = {
         'isCorrectUser': user_valid,
-        'isCorrectPass': correct_pass if user_valid else False
+        # Khong can phai if tai vi da handle trong function check_user roi
+        'isCorrectPass': correct_pass
     }
     
     return jsonify(response)
