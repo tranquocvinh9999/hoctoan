@@ -27,7 +27,7 @@ def random_10_cau_hoi_nhan_cong_tru():
         dem += 1
 
     return questions
-#ai
+#ai đây
 def generate_questions_from_a_name_AI(name):
     genai.configure(api_key="AIzaSyDZKaDnvhAfcNVUfKJiDoGb1bHYNGyAFeA")
     model = genai.GenerativeModel("gemini-1.5-flash")
