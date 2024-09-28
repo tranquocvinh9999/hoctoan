@@ -36,7 +36,7 @@ Học toán cho người khiếm thính:
       - Có một database khoảng 100 câu hỏi
       - Chấm điểm
       - Truy xuất từng câu hỏi trên database rồi gộp chúng vào 1 bài gồm 10 câu
-
+      - Cho giáo viên sinh ra bằng tập bằng ai
 
 cho giáo viên nhập bài giảng luôn
 - tập trung vào:

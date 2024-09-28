@@ -1,0 +1,7 @@
+{
+    "Hãy liệt kê tất cả các ước của số 12.": "1, 2, 3, 4, 6, 12.",
+    "Số 17 có phải là số nguyên tố không? Tại sao?": "Có. Vì 17 chỉ có hai ước là 1 và chính nó.",
+    "Hãy tìm tất cả các số nguyên tố nhỏ hơn 20.": "2, 3, 5, 7, 11, 13, 17, 19.",
+    "Số 1 có phải là số nguyên tố không? Giải thích.": "Không. Vì số 1 chỉ có một ước là 1, không thỏa mãn điều kiện có 2 ước là 1 và chính nó.",
+    "Phân tích số 36 ra thừa số nguyên tố.": "36 = 2 x 2 x 3 x 3 = 2<sup>2</sup> x 3<sup>2</sup>."
+}
