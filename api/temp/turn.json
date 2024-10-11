@@ -1,0 +1,20 @@
+{
+    "kk": {
+        "user_score": 100,
+        "user_correct": 100,
+        "user_fail": 10,
+        "rank": "Xuat Sac"
+    },
+    "skibidis": {
+        "user_score": 150,
+        "user_correct": 140,
+        "user_fail": 10,
+        "rank": "Tot"
+    },
+    "skibidi": {
+        "user_score": 150,
+        "user_correct": 100,
+        "user_fail": 50,
+        "rank": "Kha"
+    }
+}

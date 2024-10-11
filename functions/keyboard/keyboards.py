@@ -32,7 +32,7 @@ def speak(text):
     pygame.mixer.music.play()
     while pygame.mixer.music.get_busy():
         pygame.time.Clock().tick(10)
-def input_with_speak(prompt):
+def nhap_va_noi(prompt):
     speak(prompt)
     result = ""
     while True:
@@ -46,5 +46,7 @@ def input_with_speak(prompt):
             elif char == '\b': 
                 if result:
                     result = result[:-1]
-                    speak("backspace")
+                    speak("đã xóa 1 chữ")
+            elif char == ' ':
+                speak("dấu cách")
     return result

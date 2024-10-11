@@ -1,0 +1,20 @@
+{
+    "Tìm số đối của số 5": " -5",
+    "Tìm số đối của số -12": " 12",
+    "Tìm số đối của số 0": " 0",
+    "Viết số đối của số 3/4": " -3/4",
+    "Viết số đối của số -2/5": " 2/5",
+    "So sánh hai số: -3 và 2": " -3 < 2",
+    "So sánh hai số: 5 và -7": " 5 > -7",
+    "So sánh hai số: -10 và -15": " -10 > -15",
+    "Tìm số nguyên dương nhỏ nhất": " 1",
+    "Tìm số nguyên âm lớn nhất": " -1",
+    "Tìm số nguyên dương lớn nhất": " Không có số nguyên dương lớn nhất.",
+    "Tìm số nguyên âm nhỏ nhất": " Không có số nguyên âm nhỏ nhất.",
+    "Viết số nguyên dương nhỏ nhất": " 1",
+    "Viết số nguyên âm lớn nhất": " -1",
+    "Viết 3 số nguyên dương liên tiếp": " Ví dụ: 1, 2, 3",
+    "Viết 3 số nguyên âm liên tiếp": " Ví dụ: -3, -2, -1",
+    "Tìm số nguyên dương x biết x < 5": " x = 1, 2, 3, 4",
+    "Tìm số nguyên âm x biết x > -5": " x = -4, -3, -2, -1"
+}

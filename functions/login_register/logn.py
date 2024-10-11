@@ -1,6 +1,6 @@
 import json
 import requests
-from functions.keyboard.keyboards import speak, input_with_speak
+from functions.keyboard.keyboards import speak, nhap_va_noi
 from functions.microphone.micro import recognize_speech, check
 
 # Function to update JSON file
@@ -45,8 +45,8 @@ def new_user(user, pasw):
 with open("config/score.json") as f:
     settings = json.load(f)
     score = settings["user_score"]
-    succes = settings["user_succes"]
-    fail = settings["user_fail"]
+    succes = settings["user_correct"]
+    fail = settings["user_wrong"]
     username = settings["user"]
 
 with open("config/private.json") as f:
@@ -58,8 +58,8 @@ with open("config/private.json") as f:
 def regis():
     speak("Bạn chưa đăng kí tài khoản nào. Hãy đăng kí bằng cách nhập từ bàn phím.")
     speak("Lưu ý: Tên đăng nhập không có chữ in hoa và kí tự đặc biệt.")
-    user = input_with_speak("Nhập tên")
-    password = input_with_speak("Nhập mật khẩu")
+    user = nhap_va_noi("Nhập tên")
+    password = nhap_va_noi("Nhập mật khẩu")
     
     if user.islower() and user.isalnum():
         update_json("username", user)
@@ -87,7 +87,7 @@ def loginpage():
 
 def login_check():
     from main import mainop  
-    k = input_with_speak(f"Vui lòng nhập mật khẩu tài khoản {usernames}.")
+    k = nhap_va_noi(f"Vui lòng nhập mật khẩu tài khoản {usernames}.")
     if k == passwords:
         mainop()
     else:
@@ -97,8 +97,8 @@ def login_check():
 
 def recall():
     speak("Lưu ý: Tài khoản và mật khẩu không được có chữ in hoa và kí tự đặc biệt.")
-    user = input_with_speak("Bạn hãy nhập tài khoản.")
-    passw = input_with_speak("Bạn hãy nhập mật khẩu.")
+    user = nhap_va_noi("Bạn hãy nhập tài khoản.")
+    passw = nhap_va_noi("Bạn hãy nhập mật khẩu.")
 
     if user and passw:
         if req(user, passw) == True:
@@ -123,4 +123,3 @@ def login_register_main():
         loginpage()
     elif kt in ["đăng ký", "ký"]:
         regis()
-
