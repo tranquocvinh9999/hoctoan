@@ -1,20 +1,8 @@
 {
-    "kk": {
-        "user_score": 100,
-        "user_correct": 100,
-        "user_fail": 10,
-        "rank": "Xuat Sac"
-    },
-    "skibidi": {
-        "user_score": 150,
-        "user_correct": 100,
-        "user_fail": 50,
-        "rank": "Kha"
-    },
-    "skibidis": {
-        "user_score": 150,
-        "user_correct": 140,
-        "user_fail": 10,
-        "rank": "Tot"
+    "jh": {
+        "user_score": 0,
+        "user_correct": 0,
+        "user_fail": 0,
+        "rank": ""
     }
 }

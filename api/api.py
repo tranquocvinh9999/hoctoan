@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 import json, os
 import flask_socketio
+import json
 app = Flask(__name__)
 # 123
 def check_user_passw(thamso, pasw):
@@ -71,6 +72,51 @@ def create_file(file_name):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
     return folder_path
+def get_rank(correct, score):
+    rate: float
+    rank: str
+    if score == 0:  
+        rate = 0
+    else:
+        rate = correct / score
+
+    if rate >= 1.0:
+        rank = "Xuat Sac"
+    elif rate >= 0.8:
+        rank = "Tot"
+    elif rate >= 0.6:
+        rank = "Kha"
+    else:
+        rank = "Trung Binh"
+    return rank
+    
+def sort():
+    filepath = "database/leaderboard.json"
+    with open(filepath) as f:
+        data = json.load(f)
+
+    rank_priority = {
+        "Xuat Sac": 0,
+        "Tot": 1,
+        "Kha": 2,
+        "Trung Binh": 3
+    }   
+
+    sorted_data = sorted(data.items(), key=lambda x: (rank_priority.get(x[1]['rank'], 4), -x[1]['user_score']))
+
+    all_data = {}
+    print(sorted_data)
+    for student, student_data in sorted_data:
+        all_data[student] = {
+            "user_score": student_data["user_score"],
+            "user_correct": student_data["user_correct"],
+            "user_fail": student_data["user_fail"],
+            "rank": student_data["rank"]
+        }
+
+    print(all_data)
+    with open(filepath, 'w', encoding='utf-8') as file:
+        json.dump(all_data, file, ensure_ascii=False, indent=4)
 
 @app.route('/upload', methods=['POST'])
 def upload_baigiang():
@@ -101,11 +147,13 @@ def upload_baigiang():
     
     return jsonify({'message': 'Tải bài giảng thành công', 'folder': folder_path}), 200
 # 127.0.0.1/download/{file}
-# 127.0.0.1/download/info/{file} Lấy thông tin về file có trong foler không
+# 127.0.0.1/download/info.txt/{file} Lấy thông tin về file có trong foler không
 # --- info.txt 
 # ---- Lấy path file rồi gửi lại cho client
 
 ## chx test
+# /download/?user=asdfa
+
 @app.route('/download/<file_name>', methods=['GET'])
 def download_baigiang(file_name):
     folder_name = file_name.rsplit('.', 1)[0]
@@ -123,68 +171,29 @@ def submit_scores():
     score = request.json.get('score')
     wrong = request.json.get('wrong')
     if not name or correct is None or score is None or wrong is None:
-        return ({"không có dữ liêu"}), 400
-    with open("database/leadearboard.json") as f:
+        return "không có dữ liêu"
+    with open("database/leaderboard.json", "r") as f:
         data = json.load(f)
-    data[name] = {"user_score": score, "user_correct": correct, "user_fail": wrong}
-    return({"đã lưu thành công data"}), 200
+    data[name] = {"user_score": score, "user_correct": correct, "user_fail": wrong, "rank": get_rank(correct, score)}
+    sort()
+    with open("database/leaderboard.json", "w") as f:
+        json.dump(data, f, indent=4)
+    return  "đã lưu thành công data"
 
-import json
-
-def sort():
-
+@app.get("/scores")
+@app.get("/scores/<username>")
+def get_scores(username):
     with open("database/leaderboard.json") as f:
         data = json.load(f)
-
-    for student, scores in data.items():
-        correct = scores.get("user_correct", 0)
-        score = scores.get("user_score", 1) 
-        if score == 0:  
-            rate = 0
-        else:
-            rate = correct / score
-
-        if rate >= 1.0:
-            data[student]['rank'] = "Xuat Sac"
-        elif rate >= 0.8:
-            data[student]['rank'] = "Tot"
-        elif rate >= 0.6:
-            data[student]['rank'] = "Kha"
-        else:
-            data[student]['rank'] = "Trung Binh"
-
-    with open("database/leaderboard.json", 'w', encoding='utf-8') as file:
-        json.dump(data, file, ensure_ascii=False, indent=4)
-
-    
-    rank_priority = {
-        "Xuat Sac": 0,
-        "Tot": 1,
-        "Kha": 2,
-        "Trung Binh": 3
-    }   
-
-    sorted_data = sorted(data.items(), key=lambda x: (rank_priority.get(x[1]['rank'], 4), -x[1]['user_score']))
-    
-
-    filepath2 = "temp/turn.json"
-    all_data = {}
-
-    for student, student_data in sorted_data:
-        all_data[student] = {
-            "user_score": student_data["user_score"],
-            "user_correct": student_data["user_correct"],
-            "user_fail": student_data["user_fail"],
-            "rank": student_data["rank"]
-        }
-
-   
-    with open(filepath2, 'w', encoding='utf-8') as file:
-        json.dump(all_data, file, ensure_ascii=False, indent=4)
+    if username == None:
+        return data
+    if not data[username]:
+        return jsonify({'error': 'Không có user'}), 400
+    return data[username]
 
 @app.route("/get_information_ranks", methods=['GET'])
 def get_information_ranks():
-    sort()
+    # sort()
     with open("temp/turn.json") as f:
         data = json.load(f)
     return jsonify(data)

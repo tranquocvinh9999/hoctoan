@@ -4,7 +4,7 @@ from functions.keyboard.keyboards import speak, nhap_va_noi
 from functions.microphone.micro import recognize_speech, check
 
 # Function to update JSON file
-def update_json(field, new_value, filename="config/private.json"):
+def update_json(field, new_value, filename=""):
     try:
         with open(filename, 'r', encoding='utf-8') as json_file:
             data = json.load(json_file)
@@ -46,7 +46,7 @@ with open("config/score.json") as f:
     settings = json.load(f)
     score = settings["user_score"]
     succes = settings["user_correct"]
-    fail = settings["user_wrong"]
+    fail = settings["user_fail"]
     username = settings["user"]
 
 with open("config/private.json") as f:
@@ -67,8 +67,8 @@ def regis():
         speak("Tên tài khoản có chữ in hoa hoặc kí tự đặc biệt.")
     
     if password.islower() and password.isalnum():
-        update_json("password", password)
-        new_user(user, password)
+        update_json("password", password, "config/private.json")
+        new_user(user, password, "config/private.json")
     else:
         speak("Mật khẩu có chữ in hoa hoặc kí tự đặc biệt.")
     
@@ -103,8 +103,9 @@ def recall():
     if user and passw:
         if req(user, passw) == True:
             speak("Bạn đã đăng nhập thành công.")
-            update_json("username", user)
-            update_json("password", passw)
+            update_json("username", user, "config/private.json")
+            update_json("password", passw, "config/private.json")
+            update_json("user", user, "config/score.json")
         else:
             speak("Có vẻ cả tài khoản và mật khẩu đều sai.")
             speak("Hãy đăng nhập lại nhé.")

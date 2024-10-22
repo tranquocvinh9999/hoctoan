@@ -9,6 +9,8 @@ from functions.get_lesson_from_server.upload import upload
 from functions.get_lesson_from_server.get import download_file
 import json
 import requests
+from functions.get_lesson_from_server.get import get_lessons_info, download_file
+
 # 123
 # bài tập 
 # bài giảng
@@ -60,8 +62,7 @@ def pratice():
     if chapter.strip():
         get_data_from_given_question_and_ask_AI(str(chapter))
 
-def manu(
-):
+def menu():
     speak("Chào bạn đã tới chương trình")
     speak("Nếu bạn muốn nói gì thì cứ nhấn Q nhé")
     
@@ -97,30 +98,24 @@ def receive_data_from_server():
 # k = 'sus.txt'
 # download_file(k)
 
-with open("config/score.json") as f:
-    settings = json.load(f)
-    old_score = settings["user_score"]
-    old_correct = settings["user_correct"]
-    old_wrong = settings["user_wrong"]
-    username = settings["user"]
 def submit_scores():
-    a, b, c = get_data_from_given_question_and_ask_AI("số nguyên tố")
-    new_correct = old_correct + a
-    new_wrong = old_wrong + b
-    new_score = old_score + c
-    speak(f"chúc mừng bạn đã đúng được {a} câu và {b} câu sai tổng kết điểm là {c}")
-    data = {
-            "user_score": {new_score},
-            "user_correct": {new_correct},
-            "user_wrong": {new_wrong}
-        }
+    # a, b, c = get_data_from_given_question_and_ask_AI("số nguyên tố")
     with open("config/score.json") as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+        file_data = json.load(f)
+        username = file_data["user"]
+    url = "http://127.0.0.1:5000/scores/" + username
+    data = requests.get(url).json()
+    a, b, c = 6, 4, 6
+    new_correct = data["user_correct"] + a
+    new_wrong = data["user_fail"] + b
+    new_score = data["user_score"] + c
+    speak(f"chúc mừng bạn đã đúng được {a} câu và {b} câu sai tổng kết điểm là {c}")
+    # with open("config/score.json", "w") as f:
+    #     json.dump(data, f)
     send_data(new_score, new_correct, new_wrong, username)
-receive_data_from_server()
-
+# receive_data_from_server()
+# submit_scores()
 # lay bai giang
-from functions.get_lesson_from_server.get import get_lessons_info, download_file
 
 def baigiang(name):
     k = download_file(name)
@@ -133,4 +128,6 @@ def baigiang(name):
             for line in lines:
                 speak(line.strip())
         else:
-            manu()
+            menu()
+
+login_register_main()
