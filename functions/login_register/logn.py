@@ -4,7 +4,7 @@ from functions.keyboard.keyboards import speak, nhap_va_noi
 from functions.microphone.micro import recognize_speech, check
 
 # Function to update JSON file
-def update_json(field, new_value, filename=""):
+def update_json(field, new_value, filename=None):
     try:
         with open(filename, 'r', encoding='utf-8') as json_file:
             data = json.load(json_file)
@@ -19,6 +19,10 @@ def update_json(field, new_value, filename=""):
         print("Key not found.")
     except Exception as e:
         print(f"An error occurred: {e}")
+with open("ip_host.json") as f:
+    settings = json.load(f)
+    ip = settings["ip"]
+    port = settings["port"]
 
 
 def req(users, pasw):
@@ -26,12 +30,12 @@ def req(users, pasw):
        "user": users,
        "pass": pasw
     }
-    res = requests.post("http://127.0.0.1:5000/check_user", json=data)
+    res = requests.post(f"http://{ip}:{port}/check_user", json=data)
     valid_user = res.json().get("isCorrectUser")
     valid_passw = res.json().get("isCorrectPass")
-    if valid_user and valid_passw:
+    if valid_user == True and valid_passw == True:
         return True
-    elif not valid_passw:
+    elif not valid_passw == False:
         return False
     return 2
 
@@ -40,7 +44,7 @@ def new_user(user, pasw):
        "user": user,
        "pass": pasw
     }
-    res = requests.post("http://127.0.0.1:5000/receive_new_user", json=data)
+    res = requests.post(f"http://{ip}:{port}/receive_new_user", json=data)
 
 with open("config/score.json") as f:
     settings = json.load(f)

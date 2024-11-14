@@ -1,18 +1,66 @@
-{
-    "Hãy sắp xếp các số thập phân sau theo thứ tự tăng dần: 2,5; 1,7; 3,2; 0,9": " 0,9; 1,7; 2,5; 3,2",
-    "Tìm số đối của số thập phân -3,5": " 3,5",
-    "Tính tổng của hai số thập phân: 1,23 + 4,56": " 5,79",
-    "Tính hiệu của hai số thập phân: 7,89 - 3,45": " 4,44",
-    "Tìm tích của hai số thập phân: 2,5 x 1,2": " 3",
-    "Tính thương của hai số thập phân: 10,5 : 2,5": " 4,2",
-    "Tìm giá trị tuyệt đối của số thập phân -5,6": " 5,6",
-    "Viết số thập phân 0,35 dưới dạng phân số": " 7/20",
-    "Viết phân số 2/5 dưới dạng số thập phân": " 0,4",
-    "Tìm số thập phân có phần nguyên là 3 và phần thập phân là 25": " 3,25",
-    "Tìm số thập phân có phần nguyên là 0 và phần thập phân là 123": " 0,123",
-    "Tìm số thập phân có phần nguyên là 1 và phần thập phân là 001": " 1,001",
-    "Tìm số thập phân bé nhất trong các số: 1,2; 1,02; 1,23; 1,32": " 1,02",
-    "Tìm số thập phân lớn nhất trong các số: 2,45; 2,54; 2,5; 2,4": " 2,54",
-    "Tìm số thập phân có phần nguyên là 2 và phần thập phân là 100": " 2,100",
-    "Tìm số thập phân có phần nguyên là 5 và phần thập phân là 001": " 5,001"
-}
+[
+    {
+        "question": "Hãy sắp xếp các số thập phân sau theo thứ tự tăng dần: 2,5; 1,7; 3,2; 0,9",
+        "answer": "0,9; 1,7; 2,5; 3,2"
+    },
+    {
+        "question": "Tìm số đối của số thập phân -3,5",
+        "answer": "3,5"
+    },
+    {
+        "question": "Tính tổng của hai số thập phân: 1,23 + 4,56",
+        "answer": "5,79"
+    },
+    {
+        "question": "Tính hiệu của hai số thập phân: 7,89 - 3,45",
+        "answer": "4,44"
+    },
+    {
+        "question": "Tìm tích của hai số thập phân: 2,5 x 1,2",
+        "answer": "3"
+    },
+    {
+        "question": "Tính thương của hai số thập phân: 10,5 : 2,5",
+        "answer": "4,2"
+    },
+    {
+        "question": "Tìm giá trị tuyệt đối của số thập phân -5,6",
+        "answer": "5,6"
+    },
+    {
+        "question": "Viết số thập phân 0,35 dưới dạng phân số",
+        "answer": "7/20"
+    },
+    {
+        "question": "Viết phân số 2/5 dưới dạng số thập phân",
+        "answer": "0,4"
+    },
+    {
+        "question": "Tìm số thập phân có phần nguyên là 3 và phần thập phân là 25",
+        "answer": "3,25"
+    },
+    {
+        "question": "Tìm số thập phân có phần nguyên là 0 và phần thập phân là 123",
+        "answer": "0,123"
+    },
+    {
+        "question": "Tìm số thập phân có phần nguyên là 1 và phần thập phân là 001",
+        "answer": "1,001"
+    },
+    {
+        "question": "Tìm số thập phân bé nhất trong các số: 1,2; 1,02; 1,23; 1,32",
+        "answer": "1,02"
+    },
+    {
+        "question": "Tìm số thập phân lớn nhất trong các số: 2,45; 2,54; 2,5; 2,4",
+        "answer": "2,54"
+    },
+    {
+        "question": "Tìm số thập phân có phần nguyên là 2 và phần thập phân là 100",
+        "answer": "2,100"
+    },
+    {
+        "question": "Tìm số thập phân có phần nguyên là 5 và phần thập phân là 001",
+        "answer": "5,001"
+    }
+]

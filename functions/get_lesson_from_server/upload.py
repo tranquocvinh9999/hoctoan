@@ -2,10 +2,14 @@ import requests
 from functions.keyboard.keyboards import speak
 from functions.microphone.micro import check
 from functions.microphone.micro import recognize_speech
-
+import json
+with open("ip_host.json") as f:
+    settings = json.load(f)
+    ip = settings["ip"]
+    port = settings["port"]
 
 def upload(file_path):
-    url = "http://127.0.0.1:5000/upload"
+    url = f"http://{ip}:{port}/upload"
     with open(file_path, 'rb') as f:
         files = {"file": f}
         response = requests.post(url, files=files)

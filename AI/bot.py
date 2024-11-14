@@ -38,23 +38,27 @@ của phòng giáo dục Việt Nam bạn hãy viết cho tôi {so_luong_cau_hoi
 bỏ các chữ in hoa khi bạn trả về text cho tôi nữa bỏ các chữ như Bài 1 bài 2 và tiếp tục cho đến bài cuối khi bạn trả về tôi chỉ cần mỗi ĐỊNH DẠNH CÂU HỎI:CÂU TRẢ LỜI cho các bài ở dạng tầm bình thường thôi đừng khó quá vì học sinh của tôi là người khiếm thị
 bỏ tiêu đề của các bài bạn trả về đi VÀ TÔI BẮT BUỘC PHẢI lưu ý VÀ CỐ ĐỊNH khi bạn trả về các câu hỏi thì có định dạng là Question:answer để tôi còn có dữ liệu để trả về nữa các câu hỏi và trả lời được ngăn cách nhau bằng kí tự | để tôi có thể phân biệt và lưu nó về file json
 VÀ HÃY CHẮC CHẮN NHỮNG LẦN TRẢ VỀ KẾT QUẢ SAU CỦA BẠN HÃY LÀM GIỐNG NHƯ NÀY độ khó ở mức dễ vì học sinh tôi là người khiếm thị tôi không cần bạn phân tích TÔI CHỈ CẦN BẠN IN BÀI TẬP RA  VÀ CHỈ DÙNG | ĐỂ PHÂN CÁCH GIỮA CÂU HỎI VÀ CÂU TRẢ LỜI KHÔNG DÙNG | ĐỂ PHÂN CÁCH CÁC CÂU HỎI
-VÀ HÃY CỐ ĐỊNH RẰNG NÓ CÓ ĐỊNH DẠNG QUESTIONS: | ANSWER: 
+VÀ HÃY CỐ ĐỊNH RẰNG NÓ CÓ ĐỊNH DẠNG QUESTIONS: | ANSWER: BỎ CÁC DẤU * ĐI
 """)
     
 
     print(response.text)
 
     lines = response.text.strip().split('\n')
-    data = {}
+    data = []
 
     for line in lines:
-        line = line.strip() 
+        line = line.strip()
         if '|' in line:
             try:
-                question, answer = line.split('|', 1)  
-                question = question.replace("Question:", "").strip() 
-                answer = answer.strip().replace("Answer:", "")  
-                data[question] = answer
+                question, answer = line.split('|', 1)
+                question = question.replace("Question:", "").strip()
+                answer = answer.strip().replace("Answer:", "").lower().strip()
+            # Append the question and answer as a dictionary to the list
+                data.append({
+                    "question": question,
+                    "answer": answer
+                })
             except ValueError as e:
                 print(f"Lỗi tách câu hỏi và câu trả lời: {e}")
         else:

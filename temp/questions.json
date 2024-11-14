@@ -1,0 +1,17 @@
+{
+    "Liệt kê tất cả các ước của 12.": "1, 2, 3, 4, 6, 12",
+    "Liệt kê tất cả các ước của 17.": "1, 17",
+    "Số 7 có phải là số nguyên tố không?": " Có",
+    "Số 15 có phải là số nguyên tố không?": " Không",
+    "Số nào trong các số sau là số nguyên tố: 2, 4, 6, 8, 11?": " 2, 11",
+    "Số nào trong các số sau là số nguyên tố: 13, 21, 29, 35?": " 13, 29",
+    "Viết số 15 thành tổng của hai số nguyên tố.": " 2 + 13",
+    "Viết số 21 thành tổng của hai số nguyên tố.": " 2 + 19",
+    "Tìm số nguyên tố p biết p + 2 cũng là số nguyên tố.": " 3, 5, 7, 11, 13, 17, 19, 23, 29,...",
+    "Tìm số nguyên tố p biết p + 4 cũng là số nguyên tố.": " 3, 7, 13, 19, 23, 37, 43, 53, ...",
+    "Tìm số nguyên tố p biết p + 6 và p + 8 cũng là số nguyên tố.": " 5",
+    "Tìm số nguyên tố p biết p + 10 và p + 14 cũng là số nguyên tố.": " 3, 7, 13, 17, 19, 37, 41, 43, 67, 73,...",
+    "Tìm số nguyên tố p biết p + 2, p + 6, p + 8, p + 14 cũng là số nguyên tố.": " 3",
+    "Tìm số nguyên tố p biết p + 4, p + 6, p + 10, p + 12, p + 16 cũng là số nguyên tố.": " 3",
+    "Tìm số nguyên tố p biết p + 2, p + 6, p + 8, p + 12, p + 14 cũng là số nguyên tố.": " 5"
+}

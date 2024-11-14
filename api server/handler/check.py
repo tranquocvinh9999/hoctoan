@@ -1,1 +1,0 @@
-# kiểm tra ai nộp trước
