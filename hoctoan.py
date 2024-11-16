@@ -1,3 +1,29 @@
+import subprocess
+import sys
+from functions.keyboard.keyboards import speak
+yeucau = [
+    "SpeechRecognition",
+    "google-generativeai",
+    "requests",
+    "msvcrt",
+    "gTTS",
+    "pygame",
+    "time",
+    "random"
+]
+
+
+def taithuvien():
+    for lib in yeucau:
+        try:
+            __import__(lib)
+        except ImportError:
+            speak(f"{lib} không được tìm thấy đang tải xuống")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", lib])
+
+
+taithuvien()
+
 import json
 import requests
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -185,21 +211,24 @@ class Register(QtWidgets.QDialog):
         username = self.acc.text()
         password = self.passw.text()
 
-        if req(username, password):  
-            print("Đăng ký thành công!")
-            update_json("username", username, "config/private.json")
-            update_json("password", password, "config/private.json")
-            new_user(username, password)
-            self.Dialog.hide()
-            self.open_main_interface()
+        if username and password:
+            if new_user(username, password):
+                print(f"Đăng ký thành công! Chào mừng {username}")
+                update_json("username", username, "config/private.json")
+                update_json("password", password, "config/private.json")
+                self.Dialog.hide()
+                self.open_main_interface()
+            else:
+                print(f"Đã có tài khoản {username}. Vui lòng thử tên khác.")
         else:
-            print("Đăng ký thất bại!")
+            print("Vui lòng nhập đầy đủ thông tin!")
 
     def read_text_on_input(self, text):
         """Đọc to từng ký tự khi người dùng nhập"""
         if text:
             last_char = text[-1]  
             speak(last_char)  
+
     def eventFilter(self, source, event):
         """Xử lý sự kiện di chuột đến các ô nhập liệu và nút"""
         if event.type() == QtCore.QEvent.Enter:
@@ -210,6 +239,7 @@ class Register(QtWidgets.QDialog):
             elif source == self.register_btn:
                 speak("Nút đăng ký")
         return super().eventFilter(source, event)
+
     def open_main_interface(self):
         self.main_window = QtWidgets.QDialog()
         self.ui = Ui_Qdialog()
