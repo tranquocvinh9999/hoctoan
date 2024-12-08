@@ -1,6 +1,14 @@
-import subprocess
-import sys
-from functions.keyboard.keyboards import speak
+import subprocess, os
+import sys 
+import json
+import requests
+from PyQt5 import QtCore, QtGui, QtWidgets
+from functions.microphone.micro import check
+from functions.login_register.logn import new_user
+from functions.login_register.logn import update_json
+from functions.login_register.logn import req
+from ui import Ui_Qdialog
+from functions.resource_path.path import resource_path
 yeucau = [
     "SpeechRecognition",
     "google-generativeai",
@@ -13,30 +21,21 @@ yeucau = [
 ]
 
 
+from functions.keyboard.keyboards import speak
+
 def taithuvien():
     for lib in yeucau:
         try:
+            
             __import__(lib)
         except ImportError:
             speak(f"{lib} không được tìm thấy đang tải xuống")
             subprocess.check_call([sys.executable, "-m", "pip", "install", lib])
 
 
-taithuvien()
-
-import json
-import requests
-from PyQt5 import QtCore, QtGui, QtWidgets
-from functions.keyboard.keyboards import speak, nhap_va_noi
-from functions.microphone.micro import recognize_speech, check
-from functions.login_register.logn import new_user
-from functions.login_register.logn import update_json
-from functions.login_register.logn import req
-from ui import Ui_Qdialog
-
 
 def load_user_data():
-    with open("config/private.json", encoding='utf-8') as f:
+    with open(resource_path("config/private.json"), encoding='utf-8') as f:
         settings = json.load(f)
         usernames = settings.get("username", None)
         passwords = settings.get("password", None)
@@ -53,8 +52,9 @@ class Login(QtWidgets.QDialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(485, 547)
         Dialog.setStyleSheet("background-color: rgb(198, 198, 198);\n"
-                             "background-color: rgb(139, 139, 139);\n"
-                             "font: 8pt \"Segoe UI Historic\";")
+                         "background-color: rgb(139, 139, 139);\n"
+                         "font: 8pt \"Segoe UI Historic\";")
+        Dialog.setWindowFlags(Dialog.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)  
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(90, 30, 351, 101))
         self.label.setStyleSheet("\n"
@@ -110,7 +110,13 @@ class Login(QtWidgets.QDialog):
     def handle_login(self):
         username = self.acc.text()
         password = self.passw.text()
-
+        if username == "admin123--" and password == "nguyenvantroi123":
+            speak("Đăng nhập giáo viên thành công!")
+            update_json("username", "admin123--", "config/private.json")
+            update_json("password", "nguyenvantroi123", "config/private.json")
+            self.Dialog.hide()
+            self.open_main_interface()
+            return
         if req(username, password) == True: 
             print("Đăng nhập thành công!")
             update_json("username", username, "config/private.json")
@@ -143,6 +149,7 @@ class Login(QtWidgets.QDialog):
 
 
 
+
 class Register(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
@@ -152,8 +159,9 @@ class Register(QtWidgets.QDialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(485, 547)
         Dialog.setStyleSheet("background-color: rgb(198, 198, 198);\n"
-                             "background-color: rgb(139, 139, 139);\n"
-                             "font: 8pt \"Segoe UI Historic\";")
+                         "background-color: rgb(139, 139, 139);\n"
+                         "font: 8pt \"Segoe UI Historic\";")
+        Dialog.setWindowFlags(Dialog.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)  
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(90, 30, 351, 101))
         self.label.setStyleSheet("\n"
@@ -213,7 +221,7 @@ class Register(QtWidgets.QDialog):
 
         if username and password:
             if new_user(username, password):
-                print(f"Đăng ký thành công! Chào mừng {username}")
+                speak(f"Đăng ký thành công! Chào mừng {username}")
                 update_json("username", username, "config/private.json")
                 update_json("password", password, "config/private.json")
                 self.Dialog.hide()
@@ -241,36 +249,62 @@ class Register(QtWidgets.QDialog):
         return super().eventFilter(source, event)
 
     def open_main_interface(self):
+        from ui import Ui_Qdialog  
         self.main_window = QtWidgets.QDialog()
         self.ui = Ui_Qdialog()
         self.ui.setupUi(self.main_window)
-        self.main_window.show()
+        self.Dialog.accept()  
+        self.main_window.exec_()  
+
 
 def main():
     app = QtWidgets.QApplication([])
 
     username, password = load_user_data()
 
-    if username and password: 
+    if username and password:
         speak(f"Bạn đã có tài khoản tên là {username}. Bạn có muốn đăng nhập vào tài khoản này không? nói phải rồi để đăng nhập nói không phải để đăng ký tài khoản khác hoặc là nói tôi muốn đăng nhập tài khoản khác để đăng nhập")
         response = check()
+
         if response == "tôi muốn đăng nhập tài khoản khác":
             update_json("username", "", "config/private.json")
             update_json("password", "", "config/private.json")
             login = Login()
-            login.exec_()   
+            login.exec_()
 
-        elif response == "phải rồi": 
+        elif response == "phải rồi":
             login = Login()
             login.exec_()
+
         elif response == "không phải":
             registration = Register()
             registration.exec_()
-    else: 
-        registration = Register()
-        registration.exec_()
+
+        else:
+            speak("Lựa chọn không hợp lệ, khởi chạy giao diện đăng ký.")
+            registration = Register()
+            registration.exec_()
+
+    else:
+        speak("Hiện tại bạn chưa có tài khoản. Bạn muốn đăng nhập hay đăng ký tài khoản mới? Nói đăng nhập để đăng nhập hoặc nói đăng ký để tạo tài khoản.")
+        response = check()
+
+        if response == "đăng nhập":
+            login = Login()
+            login.exec_()
+
+        elif response == "đăng ký":
+            registration = Register()
+            registration.exec_()
+
+        else:
+            speak("Lựa chọn không hợp lệ. Mặc định chuyển sang giao diện đăng ký.")
+            registration = Register()
+            registration.exec_()
 
     app.exec_()
 
+
 if __name__ == "__main__":
+    taithuvien()
     main()

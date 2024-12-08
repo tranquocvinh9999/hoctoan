@@ -1,42 +1,14 @@
 [
     {
-        "question": "Tìm tổng của hai số nguyên:  (-5) + 3",
-        "answer": "-2"
+        "question": "5 + (-3) = ?",
+        "answer": "2"
     },
     {
-        "question": "Tính hiệu của hai số nguyên: 7 - (-4)",
-        "answer": "11"
-    },
-    {
-        "question": "Tìm tích của hai số nguyên: (-2) * 5",
-        "answer": "-10"
-    },
-    {
-        "question": "Thực hiện phép chia hai số nguyên: 12 : (-3)",
-        "answer": "-4"
-    },
-    {
-        "question": "Tìm giá trị tuyệt đối của số nguyên:",
-        "answer": "-7| |  7"
-    },
-    {
-        "question": "So sánh hai số nguyên: -3 và 2",
-        "answer": "-3 < 2"
-    },
-    {
-        "question": "Tính giá trị của biểu thức: (-8) + 5 - (-2)",
-        "answer": "-1"
-    },
-    {
-        "question": "Tìm số đối của số nguyên: 6",
+        "question": "(-8) - (-2) = ?",
         "answer": "-6"
     },
     {
-        "question": "Viết số nguyên âm lớn nhất có một chữ số",
-        "answer": "-1"
-    },
-    {
-        "question": "Viết số nguyên dương nhỏ nhất có hai chữ số",
-        "answer": "10"
+        "question": "(-4) x 7 = ?",
+        "answer": "-28"
     }
 ]

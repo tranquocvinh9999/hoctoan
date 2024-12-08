@@ -1,22 +1,14 @@
 [
     {
-        "question": "Liệt kê tất cả các ước của số 12.",
-        "answer": "1, 2, 3, 4, 6, 12"
+        "question": "17 là số nguyên tố phải hay không?",
+        "answer": "phải"
     },
     {
-        "question": "Số 11 có phải là số nguyên tố hay không?",
-        "answer": "có"
+        "question": "Số nguyên tố nhỏ nhất là số nào?",
+        "answer": "2"
     },
     {
-        "question": "Tìm số nguyên tố nhỏ nhất lớn hơn 20.",
-        "answer": "23"
-    },
-    {
-        "question": "Liệt kê tất cả các số nguyên tố nhỏ hơn 15.",
-        "answer": "2, 3, 5, 7, 11, 13"
-    },
-    {
-        "question": "Số 1 có phải là số nguyên tố hay không?",
-        "answer": "không"
+        "question": "Liệt kê các số nguyên tố nhỏ hơn 10.",
+        "answer": "2, 3, 5, 7"
     }
 ]

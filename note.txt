@@ -1,0 +1,16 @@
+1 - bàn phím trên màn hình /
+2 - kết hợp với narrator của window (XONG IDEA CHX GẮN) 
+3 - tối ưu phần xác nhận lại phần thông tin đã đọc /
+4 - khoảng cách giữa các nút vừa phải  /
+5 - tách riêng tài khoản học sinh và giáo viên (DONE) /
+6 - tổng hợp thành exe CHX
+7 - xác nhận bằng phím /
+8 - để full màn hình /
+9 - nói chương để học lấy từ api tạo bảng chương /
+10 - nhắc lại bài tập nếu cần /
+11 - cho thành một bảng rồi lia chuột tới chương nào thì đọc chương đó bài tập /
+12 - ----------------------------------------------------------------- lý thuyết /
+13 - RESET BẢNG XẾP HẠNG CHO GIÁO VIÊN / 
+14 - LƯU LẠI BÀI TẬP NẾU ĐANG DỞ VÀ THÊM NÚT TIẾP TỤC KHI VÀO APP / (100%)
+15 - khựng lại tầm 2s khi tới một cái mục gì đó. X
+

@@ -8,8 +8,8 @@ from functions.keyboard.keyboards import speak
 import google.generativeai as genai
 from functions.microphone.micro import check
 from AI.bot import generate_questions_from_a_name_AI
-API_KEY = 'AIzaSyDZKaDnvhAfcNVUfKJiDoGb1bHYNGyAFeA'
-
+API_KEY = 'AIzaSyAxoki6CsXdtMdWuSEwyXQ4tUGDNOLCIGA'
+import re
 class VoiceRecognitionThread(QtCore.QThread):
     recognized_text = QtCore.pyqtSignal(str)
 
@@ -31,8 +31,8 @@ def check_question_AI(question, answer, user_answer):
             Vậy học sinh của bạn liệt kê các câu trả lời sai trong câu trả lời đó thì bạn sẽ nói sao 
             với trường hợp đó. ĐẶC BIỆT NHỚ LÀ CHỈ RÕ ra các câu trả lời sai đó và nói tại sao, 
             chỉ trả về hai giá trị 'Đúng' và 'Sai' thôi không ừm gì hết. 
-            Các câu trả lời đúng sai như 'CÓ' hoặc 'KHÔNG' học sinh của tôi trả lời phải hoặc đúng hoặc 2 từ đó không dấu thì nhận diện giúp tôi. VÀ HÃY KIỂM TRA KẾT QUẢ CỦA HỌC SINH TÔI NHẬP VỚI KẾT QUẢ ĐÚNG VÌ CÓ MẤY LẦN HỌC SINH TÔI NHẬP ĐÚNG VỚI KẾT QUẢ ĐÚNG THÌ BẠN LẠI BẢO SAI
-            VÍ DỤ CÁC CÂU CÓ DẤU PHẨY NHƯ 5, 3, 2, 1 MÀ HỌC SINH TÔI TRẢ LỜI LÀ 5 3 2 1 THÌ BẠN HÃY NÓI ĐÚNG NHÉ
+            Các câu trả lời đúng sai như 'CÓ' hoặc 'KHÔNG' học sinh của tôi trả lời phải hoặc đúng hoặc 2 từ đó không dấu thì nhận diện giúp tôi.HOẶC 'PHẢI' HOẶC 'KHÔNG' MÀ HỌC SINH TÔI TRẢ LỜI 'PHAI' hoặc 'phai' HOẶC 'KHONG' HOẶC 'HONG' thì cũng tính nhé. VÀ HÃY KIỂM TRA KẾT QUẢ CỦA HỌC SINH TÔI NHẬP VỚI KẾT QUẢ ĐÚNG VÌ CÓ MẤY LẦN HỌC SINH TÔI NHẬP ĐÚNG VỚI KẾT QUẢ ĐÚNG THÌ BẠN LẠI BẢO SAI
+            VÍ DỤ CÁC CÂU CÓ DẤU PHẨY (LIỆT KÊ) NHƯ 5, 3, 2, 1 MÀ HỌC SINH TÔI TRẢ LỜI LÀ 5 3 2 1 THÌ BẠN HÃY CHO LÀ ĐÚNG NHÉ VÌ HỌC SINH TÔI CÓ THỂ KHÔNG BIẾT DẤU PHẨY Ở ĐÂU MÀ CHỈ BIẾT DẤU CÁCH THÔI
             """ 
         )
 
@@ -45,8 +45,14 @@ def check_question_AI(question, answer, user_answer):
     
     return False, "Đã xảy ra lỗi khi kiểm tra câu trả lời."
 import requests
+from functions.resource_path.path import resource_path
+file_pathss = resource_path("ip_host.json")
+with open(file_pathss) as f:
+    settings = json.load(f)
+    ip = settings["ip"]
+    port = settings["port"]
 def send_data(score, correct, wrong, username):
-    url = "http://127.0.0.1:5000/scores"
+    url = f"http://{ip}:{port}/scores"
     data = {
         "name": username,
         "correct": correct,
@@ -77,30 +83,37 @@ def recognize_speech():
         except sr.RequestError as e:
             speak(f"Không thể kết nối đến dịch vụ nhận dạng giọng nói: {e}")
             return None
-
 class Ui_Dialog(QtCore.QObject):
     check_finished = QtCore.pyqtSignal(bool, str)
-    danoi = False
-    
+
     def setupUi(self, Dialog, main_dialog=None):
+        self.questions = []  # Initialize questions as an empty list
         Dialog.setObjectName("Dialog")
         Dialog.setWindowTitle("Kiểm Tra Câu Hỏi")
-        Dialog.resize(800, 600)
+        Dialog.showFullScreen()
         Dialog.setStyleSheet("background-color: #f0f0f0;")
+        
+        self.mouse_filter = self.MouseEventFilter()
 
         self.setup_ui_elements(Dialog)
         self.setup_signals()
-        self.ask_chapter()
+
+        if not self.check_existing_questions():
+            self.ask_chapter()
+        else:
+            self.show_question()
 
     def setup_ui_elements(self, Dialog):
         main_layout = QtWidgets.QVBoxLayout(Dialog)
-
+        Dialog.setWindowState(QtCore.Qt.WindowFullScreen)  # Fullscreen mode
+        Dialog.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
+        # Khu vực câu hỏi
         self.cauhoi = QtWidgets.QTextBrowser(Dialog)
         self.cauhoi.setStyleSheet("font: 16pt 'MS Shell Dlg 2'; border: 2px solid #0078D7; border-radius: 8px;")
+        self.cauhoi.setAccessibleName("Khu vực hiển thị câu hỏi")
         main_layout.addWidget(self.cauhoi)
 
         stats_layout = QtWidgets.QHBoxLayout()
-
         self.label_3 = QtWidgets.QLabel("Số câu đúng:", Dialog)
         self.label_3.setStyleSheet("font: 16pt 'MS Shell Dlg 2';")
         stats_layout.addWidget(self.label_3)
@@ -116,38 +129,74 @@ class Ui_Dialog(QtCore.QObject):
         self.socasai = QtWidgets.QLCDNumber(Dialog)
         self.socasai.setStyleSheet("background-color: #E0A0A0; border-radius: 5px;")
         stats_layout.addWidget(self.socasai)
-
         main_layout.addLayout(stats_layout)
 
         self.nhapketqua = QtWidgets.QLineEdit(Dialog)
         self.nhapketqua.setStyleSheet("font: 26pt 'MS Shell Dlg 2'; color: #333333; border: 2px solid #0078D7; border-radius: 8px;")
+        self.nhapketqua.setAccessibleName("Ô nhập kết quả")
         main_layout.addWidget(self.nhapketqua)
 
+        # Nút kiểm tra
         self.checkbutton = QtWidgets.QPushButton("Kiểm tra", Dialog)
         self.checkbutton.setStyleSheet("font: 14pt 'MS Reference Sans Serif'; color: white; background-color: #0078D7; border-radius: 10px;")
+        self.checkbutton.setAccessibleName("Nút Kiểm Tra Câu Trả Lời")
+        self.checkbutton.setAccessibleDescription("Nhấn nút này để kiểm tra câu trả lời.")
+        self.checkbutton.installEventFilter(self.mouse_filter)
         main_layout.addWidget(self.checkbutton)
 
+        # Nút quay lại
         self.back_button = QtWidgets.QPushButton("Quay lại", Dialog)
         self.back_button.setStyleSheet("font: 14pt 'MS Reference Sans Serif'; color: white; background-color: #D70000; border-radius: 10px;")
+        self.back_button.setAccessibleName("Nút Quay Lại")
+        self.back_button.setAccessibleDescription("Nhấn nút này để quay lại chương trước.")
         main_layout.addWidget(self.back_button)
 
-        self.cauhoi.setMinimumHeight(200)
-        self.nhapketqua.setMinimumHeight(50)
-
-        main_layout.addStretch()
-
-        self.checkbutton.enterEvent = lambda event: self.speak_button_function("Kiểm tra câu trả lời.")
-        self.back_button.enterEvent = lambda event: self.speak_button_function("Quay lại chương trước.")
-        self.nhapketqua.enterEvent = lambda event: self.speak_button_function("Nhập Kết Quả Tại Đây")
-
+        # Bàn phím ảo
+        self.setup_virtual_keyboard(main_layout)
 
     class MouseEventFilter(QtCore.QObject):
         def eventFilter(self, source, event):
-            if event.type() == QtCore.QEvent.Enter:
-                if isinstance(source, QtWidgets.QPushButton):
-                    source.enterEvent(event)
+            if event.type() == QtCore.QEvent.Enter and isinstance(source, QtWidgets.QPushButton):
+                text = source.text()
+                if text == 'C': 
+                    speak("Đây là nút xóa kí tự")  
+                elif text == "-":
+                    speak("đây là dấu âm")
+                else:
+                    speak(f"Nút: {text}") 
             return super().eventFilter(source, event)
-        
+    def keyPressEvent(self, key):
+        print(f"Key pressed: {key}") 
+        if key == 'C':
+            self.nhapketqua.clear()
+        elif key == '<':
+            self.nhapketqua.setText(self.nhapketqua.text()[:-1])
+        elif isinstance(key, str):
+            self.nhapketqua.setText(self.nhapketqua.text() + key)
+
+    def setup_virtual_keyboard(self, layout):
+        keyboard_layout = QtWidgets.QGridLayout()
+        keys = [
+        ['7', '8', '9', 'C'],
+        ['4', '5', '6', '<'],
+        ['1', '2', '3', '0'],
+        ['+', '-', '*', '/'],
+        ]
+
+        for row, key_row in enumerate(keys):
+            for col, key in enumerate(key_row):
+                button = QtWidgets.QPushButton(key)
+                button.setFixedSize(60, 60)
+                button.setStyleSheet("font: 16pt 'MS Shell Dlg 2'; background-color: #E0E0E0; border: 1px solid #0078D7; border-radius: 5px;")
+                button.setAccessibleName(f"Nút {key}")
+                button.setAccessibleDescription(f"Nút {key} dùng để nhập số hoặc phép toán.")
+                button.clicked.connect(lambda _, k=key: self.keyPressEvent(k))
+                keyboard_layout.addWidget(button, row, col)
+
+        keyboard_widget = QtWidgets.QWidget()
+        keyboard_widget.setLayout(keyboard_layout)
+        layout.addWidget(keyboard_widget)
+    
     def setup_signals(self):
         self.checkbutton.clicked.connect(self.check_answer)
         self.back_button.clicked.connect(self.go_back)
@@ -164,6 +213,29 @@ class Ui_Dialog(QtCore.QObject):
         self.thread = VoiceRecognitionThread()
         self.thread.recognized_text.connect(self.process_recognized_text)
         self.thread.start()
+    def check_existing_questions(self):
+        file_path = "config/baitapdangdo.json"
+        if os.path.exists(file_path):
+            try:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    data = json.load(file)
+
+                if "question" in data and data["question"]:
+                    self.selected_chapter = data["chapter"]
+                    self.correct_answers = data["correct"]
+                    self.incorrect_answers = data["wrong"]
+                    self.current_question = data["current"]
+                    self.questions = data["question"]
+                    self.socasai.display(self.incorrect_answers)
+                    self.socaudung.display(self.correct_answers)
+                    speak(f"Tìm thấy bài tập đang làm trong chương {self.selected_chapter}. Tiếp tục từ câu hỏi số {self.current_question + 1}.")
+                    self.load_questions(data["question"])
+                    return True
+            except Exception as e:
+                print(f"Error loading questions: {e}")
+        return False
+
+
 
     def fetch_chapters(self):
         chapters = []
@@ -172,43 +244,112 @@ class Ui_Dialog(QtCore.QObject):
                 chapters.append(folder)
         return chapters
 
-    def ask_chapter(self):
-        if not self.danoi:  
-            chapters = self.fetch_chapters()
-            if chapters:
-                speak("Chọn chương bạn muốn kiểm tra.")
-                for chapter in chapters:
-                    speak(f"Chương: {chapter}")
+    def add_new_question(self):
+        speak("Xin hãy đọc tên bài tập mới.")
+        new_question_name = recognize_speech()
 
-                self.voice_recognition = VoiceRecognitionThread()
-                self.voice_recognition.recognized_text.connect(self.on_chapter_recognized)
-                self.voice_recognition.start()
-                self.danoi = True
+        if new_question_name:
+            speak(f"Bạn đã chọn bài tập mới: {new_question_name}")
 
-    def on_chapter_recognized(self, chapter_name):
-        if chapter_name:
-            self.selected_chapter = chapter_name.lower()
-            speak(f"Bạn đã chọn chương: {self.selected_chapter}")
-            generate_questions_from_a_name_AI(self.selected_chapter, 10)
+            self.selected_chapter = new_question_name
+            generate_questions_from_a_name_AI(self.selected_chapter, 3)
             self.load_questions()
         else:
-            speak("Xin vui lòng thử lại.")
+            speak("Không thể nhận diện tên bài tập. Vui lòng thử lại.")
+    def ask_chapter(self):
+        self.chapter_menu_dialog = QtWidgets.QDialog()
+        self.chapter_menu_dialog.setWindowTitle("Chọn Chương")
+        self.chapter_menu_dialog.setStyleSheet("background-color: #f0f0f0;")
 
-    def load_questions(self):
+
+        self.chapter_menu_dialog.showMaximized()
+
+
+        self.chapter_menu_dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint)
+
+        layout = QtWidgets.QVBoxLayout(self.chapter_menu_dialog)
+
+    
+        chapters = self.fetch_chapters()
+        if chapters:
+            speak("Chọn chương bạn muốn kiểm tra.")
+
+            chapters_layout = QtWidgets.QVBoxLayout()
+            for chapter in chapters:
+                chapter_button = QtWidgets.QPushButton(f"Chương: {chapter}", self.chapter_menu_dialog)
+                chapter_button.setAccessibleName(f"Nút chọn chương {chapter}")
+                chapter_button.setStyleSheet(
+                "font: 18pt 'MS Shell Dlg 2'; background-color: #0078D7; color: white; "
+                "border-radius: 10px; padding: 10px; margin: 5px;")
+                chapter_button.clicked.connect(lambda _, ch=chapter: self.on_chapter_button_clicked(ch))
+                chapters_layout.addWidget(chapter_button)
+            layout.addLayout(chapters_layout)
+        layout.addStretch()
+
+        buttons_layout = QtWidgets.QHBoxLayout()
+        add_new_question_button = QtWidgets.QPushButton("Thêm bài tập mới", self.chapter_menu_dialog)
+        add_new_question_button.setAccessibleName("Nút thêm bài tập mới")
+        add_new_question_button.setStyleSheet(
+        "font: 18pt 'MS Shell Dlg 2'; background-color: #00A300; color: white; "
+        "border-radius: 10px; padding: 10px; margin: 5px;")
+        add_new_question_button.clicked.connect(self.add_new_question)
+        buttons_layout.addWidget(add_new_question_button)
+
+        close_button = QtWidgets.QPushButton("Đóng", self.chapter_menu_dialog)
+        close_button.setStyleSheet(
+        "font: 18pt 'MS Shell Dlg 2'; background-color: #D70000; color: white; "
+        "border-radius: 10px; padding: 10px; margin: 5px;")
+        close_button.clicked.connect(self.chapter_menu_dialog.close)
+        buttons_layout.addWidget(close_button)
+
+        layout.addLayout(buttons_layout)
+
+        self.chapter_menu_dialog.exec_()
+
+    def on_chapter_button_clicked(self, chapter_name):
+
+        self.selected_chapter = chapter_name
+        speak(f"Bạn đã chọn chương: {self.selected_chapter}")
+        self.chapter_menu_dialog.close()  # Đóng cửa sổ menu
+        generate_questions_from_a_name_AI(self.selected_chapter, 3)
+        self.load_questions()
+
+    def load_questions(self, current_question_text=None):
         try:
-            with open(f'AI/question_folder/{self.selected_chapter}/questions.json', 'r', encoding='utf-8') as f:
+        # Đường dẫn tới file câu hỏi
+            question_file = f"AI/question_folder/{self.selected_chapter}/questions.json"
+
+        # Mở và đọc file câu hỏi
+            with open(question_file, "r", encoding="utf-8") as f:
                 self.cauhoi_dict = json.load(f)
 
+        # Khởi tạo danh sách câu hỏi
+            self.questions = self.cauhoi_dict
             self.current_question = 0
             self.correct_answers = 0
             self.incorrect_answers = 0
+
+        # Nếu có chỉ định câu hỏi hiện tại, tìm kiếm câu hỏi đó
+            if current_question_text:
+                for idx, question in enumerate(self.cauhoi_dict):
+                    if question.get("question") == current_question_text:  # Kiểm tra khóa "question"
+                        self.current_question = idx
+                        break
+                else:
+                # Nếu không tìm thấy câu hỏi tương ứng
+                    speak(f"Câu hỏi '{current_question_text}' không được tìm thấy.")
+                    return  # Dừng hàm nếu không tìm thấy câu hỏi
+
+        # Hiển thị câu hỏi và kích hoạt button
             self.show_question()
-            self.checkbutton.setEnabled(True) 
+            self.checkbutton.setEnabled(True)
 
         except FileNotFoundError:
-            speak("Không tìm thấy câu hỏi cho chương này.")
+            speak("Không tìm thấy danh sách câu hỏi của chương này.")
         except json.JSONDecodeError:
-            speak("Có lỗi xảy ra khi đọc file câu hỏi.")
+            speak("Có lỗi xảy ra khi đọc danh sách câu hỏi.")
+        except Exception as e:
+            print(e)
 
     def on_text_changed(self):
         if self.nhapketqua.text():
@@ -217,32 +358,66 @@ class Ui_Dialog(QtCore.QObject):
                 speak("dấu cách")
             else:
                 speak(f"{last_char}")
+    def format_question_to_speech(self, question):
+    # Loại bỏ các ký tự không cần thiết và giữ nguyên dấu
+        question = question.strip()
+        question = question.replace('=', '').replace('?', '').strip()
+    
+    # Tách các thành phần của câu hỏi: số, toán tử và từ chữ
+        components = re.findall(r'[\d\-]+|[\+\-\*/]|[a-zA-Zàáạảãâầấậẩẫăằắặẳẵêềếệểễíìíịỉĩóòóọỏõôồốộổỗơờớợởỡùủũụưừứựửữýỳýỵỷỹđ]+', question)
+    
+    # Xử lý các số âm
+        for i in range(len(components)):
+            if components[i].startswith('-'):
+                components[i] = f"âm {components[i][1:]}"  # Đọc số âm
+
+    # Chuyển đổi các toán tử thành từ tương ứng
+        operators = {'+': 'cộng', '-': 'trừ', '*': 'nhân', '/': 'chia'}
+        spoken_question = ""
+    
+        for comp in components:
+            if comp in operators:
+                spoken_question += f"{operators[comp]} "
+            else:
+                spoken_question += f"{comp} "
+
+        return spoken_question.strip()
 
     def show_question(self):
-        question = self.cauhoi_dict[self.current_question]["question"]
-        self.cauhoi.setText(question)
-        speak(question)
+    # Kiểm tra nếu không còn câu hỏi nào
+        if self.current_question >= len(self.questions):
+            speak("Bạn đã hoàn thành chương này. Chúc mừng!")
+            self.submit_scores()
+            self.cauhoi.setText("Bạn đã hoàn thành tất cả câu hỏi.")
+            return
 
+    # Lấy câu hỏi hiện tại
+        question_data = self.questions[self.current_question]
+        question_text = question_data["question"]
+        self.cauhoi.setText(question_text)
+
+    # Xử lý và làm sạch câu hỏi để đọc
+        question_text_cleaned = question_text.strip().replace('=', '').replace('?', '').replace(' ', '')
+        print(question_text_cleaned)
+        self.cauhoi.setAccessibleDescription(question_text)
+
+        spoken_question = self.format_question_to_speech(question_text)
+        print(f"Đọc câu hỏi: {spoken_question}")  # In ra câu hỏi để kiểm tra
+        speak(f"Câu hỏi là: {spoken_question}")
     def check_answer(self):
+        self.checkbutton.setDisabled(True)
         speak("bạn đã nhấn kiểm tra câu trả lời hãy chờ nhé")
-        user_answer = self.nhapketqua.text().strip()
-        correct_answer = self.cauhoi_dict[self.current_question]["answer"].strip()
+        user_answer = self.nhapketqua.text().strip() 
+        correct_answer = self.cauhoi_dict[self.current_question]["answer"].strip() 
 
-    
-        if ',' in correct_answer:
-            user_answer = correct_answer.replace(" ", ", ")
-
-  
-        if correct_answer.lower() in ["có", "yes", "y"]:
-            user_answer = "có"
-        elif correct_answer.lower() in ["không", "no", "n"]:
+        if correct_answer.lower() in ["có", "yes", "y", "phai"]:
+            user_answer = "phải"
+        elif correct_answer.lower() in ["không", "no", "n", "khong"]:
             user_answer = "không"
         elif correct_answer.lower() in ["lon hon", "lớn hơn"]:
             user_answer = user_answer.replace("lon hon", ">")
         elif correct_answer.lower() in ["be hon", "bé hơn"]:
-            user_answer = user_answer.replace("be hon", "<")
-        user_answer = user_answer
-
+            user_answer =  user_answer.replace("be hon", "<")
 
         is_correct, feedback = check_question_AI(self.cauhoi_dict[self.current_question]["question"], correct_answer, user_answer)
 
@@ -250,29 +425,81 @@ class Ui_Dialog(QtCore.QObject):
             self.correct_answers += 1
             self.socaudung.display(self.correct_answers)
             self.nhapketqua.clear()
+            speak(feedback)
         else:
             self.incorrect_answers += 1
             self.socasai.display(self.incorrect_answers)
             self.nhapketqua.clear()
+            speak(feedback)
+        
+        self.nhapketqua.clear()
+        self.checkbutton.setDisabled(False)
+        self.current_question += 1  
+        self.save_current_state()  
+        self.show_question()  
 
-        print(user_answer)
-        print(correct_answer)
-        self.check_finished.emit(is_correct, feedback)
+        print(user_answer)  
+        print(correct_answer)  
+        self.check_finished.emit(is_correct, feedback) 
 
-    def on_check_finished(self, is_correct, feedback):
-        if is_correct:
-            speak("Đúng!")
+        
+    def save_current_state(self):
+        file_path = "config/baitapdangdo.json"
+        try:
+            data = {
+                "question": self.cauhoi_dict[self.current_question]["question"],
+                "correct": self.correct_answers,
+                "wrong": self.incorrect_answers,
+                "current": self.current_question,
+                "chapter": self.selected_chapter
+            }
+            with open(file_path, "w", encoding="utf-8") as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+        except Exception as e:
+            print(f"Lỗi khi lưu trạng thái: {e}")
+    def on_check_finished(self, valid, feedback):
+        if valid:
+            self.socaudung.display(self.correct_answers)
         else:
-            speak("Sai!")
-        speak(feedback)
-        self.next_question()
+            self.socasai.display(self.incorrect_answers)
+        self.checkbutton.setDisabled(False)
 
+
+        if self.current_question < len(self.questions):
+            self.show_question()
+        else:
+            speak("Bạn đã hoàn thành bài tập.")
+            self.submit_scores()
+            self.reset_quiz()
+    def reset_baitapdangdo(self):
+    
+        data = {
+            "question": "",
+            "correct": 0,
+            "wrong": 0,
+            "current": 0,
+            "chapter": ""
+        }
+
+    # Ghi dữ liệu trống hoặc mặc định vào file JSON
+        with open("config/baitapdangdo.json", "w") as f:
+            json.dump(data, f, indent=4)
+
+    def reset_quiz(self):
+        self.reset_baitapdangdo()
+
+
+        self.correct_answers = 0
+        self.incorrect_answers = 0
+        self.current_question = 0
+
+        self.back_button.click()
     def submit_scores(self):
         with open("config/private.json") as f:
             file_data = json.load(f)
             username = file_data["username"]
 
-        url = "http://127.0.0.1:5000/scores/" + username
+        url = f"http://{ip}:{port}/scores/" + username
         data = requests.get(url).json()
 
         a = self.correct_answers 
@@ -281,11 +508,22 @@ class Ui_Dialog(QtCore.QObject):
 
         new_correct = data["user_correct"] + a
         new_wrong = data["user_fail"] + b
-        new_score = data["user_score"] + len(self.cauhoi_dict)   
+        new_score = data["user_score"] + 3  
 
         send_data(new_score, new_correct, new_wrong, username)
     def go_back(self):
         speak("Quay lại.")
+    def clear_baitapdangdo_file():
+        file_path = "config/baitapdangdo.json"
+        if os.path.exists(file_path):
+            try:
+                with open(file_path, "w", encoding="utf-8") as file:
+                    json.dump({}, file) 
+                speak("Dữ liệu trong file baitapdangdo.json đã được xóa.")
+            except Exception as e:
+                speak(f"Đã xảy ra lỗi khi xóa dữ liệu: {e}")
+        else:
+            speak("File baitapdangdo.json không tồn tại để xóa.")
 
     def next_question(self):
         self.current_question += 1
@@ -294,7 +532,10 @@ class Ui_Dialog(QtCore.QObject):
         else:
             speak("Bạn đã hoàn thành tất cả các câu hỏi.")
             self.submit_scores()  
-            self.back_button()
+            self.clear_baitapdangdo_file() 
+            self.back_button.click()
+
+# fix phần đọc dấu
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()

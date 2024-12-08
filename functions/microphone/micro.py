@@ -1,6 +1,6 @@
 import speech_recognition as sr
 from functions.keyboard.keyboards import speak
-
+from functions.resource_path.path import resource_path
 def recognize_speech():
     recognizer = sr.Recognizer()
 
@@ -24,6 +24,12 @@ def recognize_speech():
             speak(f"Không thể kết nối đến dịch vụ nhận dạng giọng nói: {e}")
             return None
 
+import keyboard  
+
+def recognize_keypress():
+    event = keyboard.read_event()
+    if event.event_type == keyboard.KEY_DOWN: 
+        return event.name  
 def check():
     original_input = None
     while True:
@@ -32,21 +38,21 @@ def check():
         
         if original_input:
             speak(f"Có phải bạn vừa nói {original_input} không?")
-            speak("Trả lời 'phải rồi' hoặc 'không phải' để xác nhận.")
+            speak("Nhấn phím 1 để xác nhận 'đúng', nhấn phím 2 để xác nhận 'sai'.")
             
-            confirmation = recognize_speech()
+            confirmation = recognize_keypress() 
 
-            if confirmation == "phải rồi":
+            if confirmation == "1": 
                 speak("Cảm ơn, chúng ta tiếp tục.")
                 return original_input
-            elif confirmation == "không phải":
+            elif confirmation == "2": 
                 speak("Hãy nói lại.")
                 original_input = None  
             else:
-                speak("Xin lỗi, tôi không hiểu. Hãy xác nhận lại.")
+                speak("Xin lỗi, tôi không hiểu. Hãy xác nhận lại bằng cách nhấn phím 1 hoặc 2.")
         else:
             speak("Xin lỗi, tôi không nghe rõ. Hãy thử lại.")
-            original_input = None 
+            original_input = None
 
 
 

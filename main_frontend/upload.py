@@ -5,7 +5,13 @@ from PyQt5.QtGui import QDragEnterEvent, QDropEvent
 from functions.keyboard.keyboards import speak  
 from functions.microphone.micro import check
 from functions.microphone.micro import recognize_speech
-
+from functions.resource_path.path import resource_path
+import json
+file_pathss = resource_path("ip_host.json")
+with open(file_pathss) as f:
+    settings = json.load(f)
+    ip = settings["ip"]
+    port = settings["port"]
 class DragDropWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
@@ -55,8 +61,8 @@ class DragDropWidget(QtWidgets.QWidget):
                 self.upload(file_path)
 
     def upload(self, file_path):
-        url = "http://127.0.0.1:5000/upload"
-        with open(file_path, 'rb') as f:
+        url = f"http://{ip}:{port}/upload"
+        with open(resource_path(file_path), 'rb') as f:
                 files = {"file": f}
                 response = requests.post(url, files=files)
                 if response.status_code == 200:

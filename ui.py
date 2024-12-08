@@ -7,13 +7,26 @@ from main_frontend.lythuyet import Ui_Dialog as Ui_Dialog2
 from main_frontend.baitap import Ui_Dialog as Ui_Dialog3   
 from main_frontend.xephang import Ui_Dialog as Ui_Dialog4  
 from main_frontend.upload import MainWindow  
-
+from functions.resource_path.path import resource_path
+import json
+file_pathss = resource_path("config/private.json")
+with open(file_pathss) as f:
+    settings = json.load(f)
+    user = settings["username"]
+    password = settings["password"]
 class Ui_Qdialog(object):
+    def __init__(self):
+        self.user_account = 0
+
     def setupUi(self, Qdialog):
+        
         Qdialog.setObjectName("Qdialog")
         Qdialog.resize(877, 496)
+        Qdialog.setWindowFlags(Qdialog.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)  
         Qdialog.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(60, 60, 60, 255), stop:1 rgba(100, 100, 100, 255));")
-
+        Qdialog.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # Remove window border
+        Qdialog.setWindowState(QtCore.Qt.WindowFullScreen)  # Fullscreen mode
+        Qdialog.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
         self.pushButton = QtWidgets.QPushButton(Qdialog)
         self.pushButton.setGeometry(QtCore.QRect(40, 17, 271, 181))
         self.pushButton.setStyleSheet(""" 
@@ -58,14 +71,24 @@ class Ui_Qdialog(object):
         self.pushButton_download.setText("TẢI BÀI")
         self.pushButton_download.clicked.connect(self.download_content) 
         self.pushButton_download.enterEvent = lambda event: speak("Tải bài") 
+        self.pushButton.setAccessibleName("Nút mở phần lý thuyết")
+        self.pushButton_2.setAccessibleName("Nút mở phần bài tập")
+        self.pushButton_3.setAccessibleName("Nút mở phần xếp hạng")
+        self.pushButton_download.setAccessibleName("Nút tải bài")
+        self.pushButton.setAccessibleDescription("Nhấn vào đây để mở phần lý thuyết.")
+        self.pushButton_2.setAccessibleDescription("Nhấn vào đây để mở phần bài tập.")
+        self.pushButton_3.setAccessibleDescription("Nhấn vào đây để mở phần xếp hạng.")
+        self.pushButton_download.setAccessibleDescription("Nhấn vào đây để tải bài.")
+
+        if user != "admin123--":
+            self.pushButton_3.setVisible(False)
+            self.pushButton_download.setVisible(False)
 
         self.retranslateUi(Qdialog)
         QtCore.QMetaObject.connectSlotsByName(Qdialog)
 
     def retranslateUi(self, Qdialog):
         Qdialog.setWindowTitle("Menu chính")
-
-
 
     def show_dialog(self, ui_class, main_dialog):
         main_dialog.hide() 
@@ -83,7 +106,8 @@ class Ui_Qdialog(object):
 
     def download_content(self):
         self.dialog = MainWindow()  
-        self.dialog.show()     
+        self.dialog.show() 
+        Qdialog.hide()  
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
