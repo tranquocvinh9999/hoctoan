@@ -1,1 +1,0 @@
-# this functions use for competition
