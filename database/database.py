@@ -10,8 +10,8 @@ load_dotenv()
 # Kết nối MongoDB, database connection
 client = MongoClient(f"{os.getenv('DATABASE_URL')}")
 db = client["test_database"]
-# users_collection = db['users']
-# leaderboard_collection = db['leaderboard']
+users_collection = db['users']
+leaderboard_collection = db['leaderboard']
 lectures_collection = db['lectures']
 
 # Tạo thư mục nếu chưa tồn tại
@@ -81,6 +81,11 @@ def reset_single_user(username):
     if result.matched_count == 0:
         return {'error': 'User not found'}, 404
     return "User data reset successfully", 200
+
+def reset_all_user():
+    leaderboard_collection.update_many({},
+        {"$set": {"user_score": 0, "user_correct": 0, "user_fail": 0, "rank": ""}}
+    )
 
 def insert_new_lecture(name, content):
     lectures_collection.insert_one({"name": name, "content": content})
