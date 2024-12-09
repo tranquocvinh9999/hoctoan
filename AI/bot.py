@@ -4,27 +4,7 @@ import google.generativeai as genai
 import os
 import json
 from functions.resource_path.path import resource_path
-def random_10_cau_hoi_nhan_cong_tru():
-    questions = []
-    dem = 0
-    lists = ["nhan", "cong", "tru"]
 
-    while dem < 10:
-        k = random.choice(lists)
-        
-        if k == "nhan":
-            a, b, res = nhan()
-            questions.append((1, a, b, res))
-        elif k == "cong":
-            a, b, res = cong()
-            questions.append((2, a, b, res))
-        elif k == "tru":
-            a, b, res = tru()
-            questions.append((3, a, b, res))
-        
-        dem += 1
-
-    return questions
 
 def generate_questions_from_a_name_AI(name, so_luong_cau_hoi):
 
@@ -99,38 +79,3 @@ def check_question_AI(question, answer, user_answer):
     elif "Sai" in response.text:
         return False,response.text  
 
-def get_data_from_given_question_and_ask_AI(name):
-    correct_answer = 0
-    wrong_answer = 0
-    score = 0
-    print(name)
-    name_remove_space = name.replace(" ", "")
-    filepath = f"AI/question_folder/{name}/questions.json"
-    
-    with open(resource_path(filepath), 'r', encoding='utf-8') as f:
-        qa_dict = json.load(f)
-
-    for question, answer in qa_dict.items():
-        speak(question) 
-        while True:
-            user_answer = nhap_va_noi("Nhập câu trả lời của bạn").strip()
-
-            result = check_question_AI(question, answer, user_answer)
-            
-            if result is not None:
-                is_correct, response_message = result
-                
-                if is_correct:
-                    speak("Đúng rồi")
-                    correct_answer+=1
-                    score += 1
-                    break  
-                else:
-                    if response_message: 
-                        speak(response_message)
-                        wrong_answer += 1
-                    else:
-                        speak("Có lỗi xảy ra, không có thông tin để nói.")
-            else:
-                speak("Có lỗi xảy ra khi kiểm tra câu trả lời.")
-    return correct_answer, wrong_answer, score

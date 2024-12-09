@@ -97,10 +97,7 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Xếp Hạng Học Sinh"))
 
     def receive_data_from_server(self):
-        url = f"http://{ip}:{port}/get_information_ranks"
-        res = requests.get(url)
-        response = res.json()
-
+        response = sort_leaderboard()
         self.tableWidget.setRowCount(len(response))
 
         for row, (name, data) in enumerate(response.items()):
