@@ -86,6 +86,7 @@ def reset_all_user():
     leaderboard_collection.update_many({},
         {"$set": {"user_score": 0, "user_correct": 0, "user_fail": 0, "rank": ""}}
     )
+    return "Reset all data successfully", 200
 
 def insert_new_lecture(name, content):
     lectures_collection.insert_one({"name": name, "content": content})

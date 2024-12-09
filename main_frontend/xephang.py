@@ -120,8 +120,7 @@ class Ui_Dialog(object):
 
     def reset_data_on_server(self):
         try:
-            url = f"http://{ip}:{port}/reset_data_on_server"
-            res = requests.post(url)  
+            res = reset_all_user()
             if res.status_code == 200:
                 QtWidgets.QMessageBox.information(self.dialog, "Thành công", "Dữ liệu đã được reset thành công!")
                 self.receive_data_from_server()  
