@@ -100,19 +100,19 @@ class Ui_Dialog(object):
         response = sort_leaderboard()
         self.tableWidget.setRowCount(len(response))
 
-        for row, (name, data) in enumerate(response.items()):
-            self.tableWidget.setItem(row, 0, QtWidgets.QTableWidgetItem(name))
-            self.tableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(data["rank"]))
-            self.tableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(str(data["user_correct"])))
-            self.tableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(str(data["user_fail"])))
-            self.tableWidget.setItem(row, 4, QtWidgets.QTableWidgetItem(str(data["user_score"])))
+        for row in len(response):
+            self.tableWidget.setItem(row, 0, QtWidgets.QTableWidgetItem(response['name']))
+            self.tableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(response["rank"]))
+            self.tableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(str(response["user_correct"])))
+            self.tableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(str(response["user_fail"])))
+            self.tableWidget.setItem(row, 4, QtWidgets.QTableWidgetItem(str(response["user_score"])))
 
             reset_button = QtWidgets.QPushButton("Reset")
             reset_button.setStyleSheet(""" 
                 QPushButton { font: bold 12pt 'MS Shell Dlg 2'; color: white; background-color: #FF9800; border-radius: 5px; padding: 5px; }
                 QPushButton:hover { background-color: #FB8C00; }
             """)
-            reset_button.clicked.connect(lambda _, user=name: self.reset_single_user(user))
+            reset_button.clicked.connect(lambda _, user=response['name']: self.reset_single_user(user))
             self.tableWidget.setCellWidget(row, 5, reset_button)
 
     def reset_data_on_server(self):

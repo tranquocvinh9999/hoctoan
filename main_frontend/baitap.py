@@ -8,6 +8,8 @@ from functions.keyboard.keyboards import speak
 import google.generativeai as genai
 from functions.microphone.micro import check
 from AI.bot import generate_questions_from_a_name_AI
+import database.database  as db
+
 API_KEY = 'AIzaSyAxoki6CsXdtMdWuSEwyXQ4tUGDNOLCIGA'
 import re
 class VoiceRecognitionThread(QtCore.QThread):
@@ -500,8 +502,7 @@ class Ui_Dialog(QtCore.QObject):
             file_data = json.load(f)
             username = file_data["username"]
 
-        url = f"http://{ip}:{port}/scores/" + username
-        data = requests.get(url).json()
+        data = db.get_scores(username)
 
         a = self.correct_answers 
         b = self.incorrect_answers 
@@ -511,7 +512,7 @@ class Ui_Dialog(QtCore.QObject):
         new_wrong = data["user_fail"] + b
         new_score = data["user_score"] + 3  
 
-        send_data(new_score, new_correct, new_wrong, username)
+        db.submit_scores(new_score, new_correct, new_wrong, username)
     def go_back(self):
         speak("Quay lại.")
     def clear_baitapdangdo_file():
