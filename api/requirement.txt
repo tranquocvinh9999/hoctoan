@@ -1,0 +1,4 @@
+pip install json
+pip install flask
+pip install flask_socketio
+pip install os
