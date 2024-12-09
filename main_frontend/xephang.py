@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import requests
 from functions.resource_path.path import resource_path
 import json
+from database.database import *
 file_pathss = resource_path("ip_host.json")
 with open(file_pathss) as f:
     settings = json.load(f)
@@ -130,10 +131,8 @@ class Ui_Dialog(object):
             QtWidgets.QMessageBox.critical(self.dialog, "Lỗi", f"Không thể kết nối tới server: {str(e)}")
     def reset_single_user(self, user):
         try:
-            url = f"http://{ip}:{port}/reset_single_user"
-            payload = {"username": user}
-            res = requests.post(url, json=payload)
-            if res.status_code == 200:
+            k = reset_single_user(user)
+            if k == 200:
                 QtWidgets.QMessageBox.information(self.dialog, "Thành công", f"Dữ liệu của {user} đã được reset thành công!")
                 self.receive_data_from_server()  
             else:
