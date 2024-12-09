@@ -97,10 +97,10 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Xếp Hạng Học Sinh"))
 
     def receive_data_from_server(self):
-        response = sort_leaderboard()
+        response = list(sort_leaderboard())
         self.tableWidget.setRowCount(len(response))
 
-        for row in len(response):
+        for row in range(len(response)):
             self.tableWidget.setItem(row, 0, QtWidgets.QTableWidgetItem(response['name']))
             self.tableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(response["rank"]))
             self.tableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(str(response["user_correct"])))
