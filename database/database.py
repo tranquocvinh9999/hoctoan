@@ -120,11 +120,11 @@ def sort_leaderboard():
         "Trung Binh": 3
     }
 
-    if len(leaderboard_collection.find()) == 0:
+    if len(list(leaderboard_collection.find())) == 0:
         return []
 
     sorted_data = sorted(
-        leaderboard_collection.find(),
+        list(leaderboard_collection.find()),
         key=lambda x: (rank_priority.get(x['rank'], 4), -x['user_score'])
     )
     return sorted_data
