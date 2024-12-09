@@ -1,7 +1,5 @@
 import random
 from functions.keyboard.keyboards import speak
-from AI.functions.math import nhan, cong, tru
-from functions.keyboard.keyboards import nhap_va_noi
 import google.generativeai as genai
 import os
 import json

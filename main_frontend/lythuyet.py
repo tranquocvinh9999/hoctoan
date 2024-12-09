@@ -8,6 +8,7 @@ import json
 from functions.resource_path.path import resource_path
 from PyQt5.QtCore import Qt
 import keyboard, threading
+import database.database as db
 
 class VoiceRecognitionThread(QtCore.QThread):
     recognized_text = QtCore.pyqtSignal(str)
@@ -28,11 +29,11 @@ class KeyPressListener(threading.Thread):
             if event.event_type == keyboard.KEY_DOWN:
                 self.callback(event.name)
 
-file_pathss = resource_path("ip_host.json")
-with open(file_pathss) as f:
-    settings = json.load(f)
-    ip = settings["ip"]
-    port = settings["port"]
+# file_pathss = resource_path("ip_host.json")
+# with open(file_pathss) as f:
+#     settings = json.load(f)
+#     ip = settings["ip"]
+#     port = settings["port"]
 
 class Ui_Dialog(object):
     def setupUi(self, dialog, main_menu):
@@ -109,14 +110,12 @@ class Ui_Dialog(object):
         self.key_listener = KeyPressListener(self.handle_key_press)
         self.key_listener.start()
 
-    def load_available_lectures(self):
-        folder_path = "baigiang"
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+    def load_available_lectures(self): 
+        lectures = db.find_all_lecture()
 
-        lectures = [f.split(".")[0] for f in os.listdir(folder_path) if f.endswith(".txt")]
         for lecture in lectures:
-            button = QtWidgets.QPushButton(lecture)
+            lecture_name = lecture['name']
+            button = QtWidgets.QPushButton(lecture_name)
             button.setStyleSheet(""" 
                 font: 24pt 'MS Reference Sans Serif'; 
                 color: white;
@@ -125,56 +124,54 @@ class Ui_Dialog(object):
                 padding: 30px;
                 margin: 20px;
             """)
-            button.setAccessibleName(f"Lecture Button {lecture}")
-            button.setAccessibleDescription(f"Click to open the lecture {lecture}")
-            button.clicked.connect(lambda _, name=lecture: self.load_lecture_text(name))
+            button.setAccessibleName(f"Lecture Button {lecture_name}")
+            button.setAccessibleDescription(f"Click to open the lecture {lecture_name}")
+            button.clicked.connect(lambda _, name=lecture_name: self.load_lecture_text(name))
             self.chapter_layout.addWidget(button)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Chương trình học tập"))
 
-    def load_lecture_text(self, lecture_name):
-        folder_path = "baigiang"
-        filename = os.path.join(folder_path, f"{lecture_name}.txt")
-        self.current_lecture_file = filename
-        if not os.path.exists(filename):
-            self.textBrowser.setPlainText("Bài giảng chưa có sẵn trên máy, đang tải về...")
-            speak("Bài giảng chưa có sẵn trên máy, đang tải về...")
-            if self.download_file(f"{lecture_name}.txt"):
-                self.display_lecture_content(filename)
-            else:
-                self.textBrowser.setPlainText("Không thể tải bài giảng. Vui lòng kiểm tra kết nối.")
-                speak("Không thể tải bài giảng. Vui lòng kiểm tra kết nối hoặc có thể bài giảng chưa có sẵn trên máy chủ!")
-                self.return_to_main_menu()
-        else:
-            self.display_lecture_content(filename)
-
-    def download_file(self, file_name):
-        url = f'http://{ip}:{port}/download/{file_name}'
-        response = requests.get(url)
-        if response.status_code == 200:
-            os.makedirs(resource_path("baigiang", exist_ok=True))
-            with open(resource_path(f"baigiang/{file_name}", 'wb')) as f:
-                f.write(response.content)
-            speak(f"Bài giảng {file_name} đã được tải về.")
-            self.load_available_lectures()
-            return True
-        else:
-            speak("Tải file thất bại.")
-            return False
-
-    def display_lecture_content(self, filename):
+    def load_lecture_text(self, lecture_name): 
         try:
-            with open(resource_path(filename), "r", encoding="utf-8") as file:
-                content = file.read()
-            self.textBrowser.setPlainText(content)
-            speak(content)
+            lecture = db.find_lecture_by_name(lecture_name)
+            self.textBrowser.setPlainText(lecture["content"])
+            speak(lecture["content"])
+
         except Exception as e:
-            error_message = f"Lỗi: {str(e)}"
+            error_message = f"Loi: {str(e)}"
             self.textBrowser.setPlainText(error_message)
             speak(error_message)
             self.return_to_main_menu()
+
+
+
+    # def download_file(self, file_name):
+    #     url = f'http://{ip}:{port}/download/{file_name}'
+    #     response = requests.get(url)
+    #     if response.status_code == 200:
+    #         os.makedirs(resource_path("baigiang", exist_ok=True))
+    #         with open(resource_path(f"baigiang/{file_name}", 'wb')) as f:
+    #             f.write(response.content)
+    #         speak(f"Bài giảng {file_name} đã được tải về.")
+    #         self.load_available_lectures()
+    #         return True
+    #     else:
+    #         speak("Tải file thất bại.")
+    #         return False
+
+    # def display_lecture_content(self, filename):
+    #     try:
+    #         with open(resource_path(filename), "r", encoding="utf-8") as file:
+    #             content = file.read()
+    #         self.textBrowser.setPlainText(content)
+    #         speak(content)
+    #     except Exception as e:
+    #         error_message = f"Lỗi: {str(e)}"
+    #         self.textBrowser.setPlainText(error_message)
+    #         speak(error_message)
+    #         self.return_to_main_menu()
 
     def add_new_lecture(self):
         speak("Xin vui lòng nói tên bài giảng bạn muốn thêm.")
@@ -186,17 +183,18 @@ class Ui_Dialog(object):
         self.voice_thread.recognized_text.connect(self.on_lecture_name_recognized)
         self.voice_thread.start()
 
-    def on_lecture_name_recognized(self, lecture_name):
-        if lecture_name:
-            speak(f"Bạn đã chọn bài giảng: {lecture_name}")
-            self.textBrowser.setPlainText(f"Bài giảng {lecture_name} đang được thêm vào...")
-            self.download_file(lecture_name)
-        else:
-            speak("Không nhận diện được tên bài giảng.")
+    # def on_lecture_name_recognized(self, lecture_name):
+    #     if lecture_name:
+    #         speak(f"Bạn đã chọn bài giảng: {lecture_name}")
+    #         self.textBrowser.setPlainText(f"Bài giảng {lecture_name} đang được thêm vào...")
+    #         self.download_file(lecture_name)
+    #     else:
+    #         speak("Không nhận diện được tên bài giảng.")
 
     def handle_key_press(self, key):
         if key == 'esc':
             self.return_to_main_menu()
+
     def return_to_main_menu(self, dialog=None):
         if not isinstance(self.main_menu, Ui_Dialog):
             self.main_menu = Ui_Dialog()  # Make sure it's an instance of Ui_Dialog

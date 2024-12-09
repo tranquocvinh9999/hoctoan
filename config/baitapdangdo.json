@@ -1,7 +1,7 @@
 {
-    "question": "",
-    "correct": 0,
+    "question": "(-8) - (-2) = ?",
+    "correct": 1,
     "wrong": 0,
-    "current": 0,
-    "chapter": ""
+    "current": 1,
+    "chapter": "số nguyên"
 }

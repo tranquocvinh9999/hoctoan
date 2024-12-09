@@ -7,6 +7,8 @@ from functions.microphone.micro import check
 from functions.microphone.micro import recognize_speech
 from functions.resource_path.path import resource_path
 import json
+import database.database as db
+
 file_pathss = resource_path("ip_host.json")
 with open(file_pathss) as f:
     settings = json.load(f)
@@ -61,16 +63,14 @@ class DragDropWidget(QtWidgets.QWidget):
                 self.upload(file_path)
 
     def upload(self, file_path):
-        url = f"http://{ip}:{port}/upload"
-        with open(resource_path(file_path), 'rb') as f:
-                files = {"file": f}
-                response = requests.post(url, files=files)
-                if response.status_code == 200:
-                    speak("Bài giảng đã được tải lên thành công")
-                    self.label.setText("Bài giảng đã được tải lên thành công!")
-                else:
-                    speak("Gửi bài giảng thất bại")
-                    self.label.setText("Gửi bài giảng thất bại!")
+        file_path_list = file_path.split("/")
+        name = file_path_list[-1]
+        name = name[:-4]
+
+        with open(resource_path(file_path), 'r') as f: 
+            db.insert_new_lecture(name, f.read())
+            speak("Bài giảng đã được tải lên thành công")
+
 
     def go_back(self):
         self.label.setText("Quay về menu chính!")

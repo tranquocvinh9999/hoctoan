@@ -1,13 +1,9 @@
-import random
 import time
 import os
 import pygame
-import gtts
 from gtts import gTTS
 import sys
 import json
-import msvcrt  
-vietnamese = False
 from functions.resource_path.path import resource_path
 pygame.mixer.init()
 
@@ -34,21 +30,3 @@ def speak(text):
     pygame.mixer.music.play()
     while pygame.mixer.music.get_busy():
         pygame.time.Clock().tick(10)
-def nhap_va_noi(prompt):
-    speak(prompt)
-    result = ""
-    while True:
-        if msvcrt.kbhit():
-            char = msvcrt.getch().decode('utf-8')
-            if char in ('\r', '\n'):
-                break
-            if char.isdigit() or char == '.' or char.islower():
-                result += char
-                speak(char)
-            elif char == '\b': 
-                if result:
-                    result = result[:-1]
-                    speak("đã xóa 1 chữ")
-            elif char == ' ':
-                speak("dấu cách")
-    return result

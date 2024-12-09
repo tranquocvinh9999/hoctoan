@@ -1,6 +1,8 @@
 import speech_recognition as sr
 from functions.keyboard.keyboards import speak
 from functions.resource_path.path import resource_path
+import keyboard  
+
 def recognize_speech():
     recognizer = sr.Recognizer()
 
@@ -24,7 +26,6 @@ def recognize_speech():
             speak(f"Không thể kết nối đến dịch vụ nhận dạng giọng nói: {e}")
             return None
 
-import keyboard  
 
 def recognize_keypress():
     event = keyboard.read_event()

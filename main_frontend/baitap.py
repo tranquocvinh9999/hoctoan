@@ -256,6 +256,7 @@ class Ui_Dialog(QtCore.QObject):
             self.load_questions()
         else:
             speak("Không thể nhận diện tên bài tập. Vui lòng thử lại.")
+
     def ask_chapter(self):
         self.chapter_menu_dialog = QtWidgets.QDialog()
         self.chapter_menu_dialog.setWindowTitle("Chọn Chương")
