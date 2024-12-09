@@ -10,8 +10,8 @@ load_dotenv()
 # Kết nối MongoDB, database connection
 client = MongoClient(f"{os.getenv('DATABASE_URL')}")
 db = client["test_database"]
-# users_collection = db['users']
-# leaderboard_collection = db['leaderboard']
+users_collection = db['users']
+leaderboard_collection = db['leaderboard']
 lectures_collection = db['lectures']
 
 # Tạo thư mục nếu chưa tồn tại
