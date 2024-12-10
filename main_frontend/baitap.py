@@ -72,8 +72,8 @@ def recognize_speech():
             return None
 class Ui_Dialog(QtCore.QObject):
     check_finished = QtCore.pyqtSignal(bool, str)
-    def __init__(self):  
-        self.username = self.load_username()
+    # def __init__(self):  
+    #     self.username = self.load_username()
 
     def load_username(self):
         with open("config/private.json") as f:
