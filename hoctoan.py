@@ -106,7 +106,7 @@ class Login(QtWidgets.QDialog):
         self.label_2.setText(_translate("Dialog", "TÀI KHOẢN"))
         self.label_3.setText(_translate("Dialog", "MẬT KHẨU"))
         self.checkloggin.setText(_translate("Dialog", "ĐĂNG NHẬP"))
-    def check_user_password(username, password):
+    def check_user_password(self, username, password):
         return db.check_user_passw(username, password)
 
     def handle_login(self):
@@ -121,13 +121,13 @@ class Login(QtWidgets.QDialog):
             return
     
         if self.check_user_password(username, password) == True: 
-            print("Đăng nhập thành công!")
+            speak("Đăng nhập thành công!")
             update_json("username", username, "config/private.json")
             update_json("password", password, "config/private.json")
             self.Dialog.hide()
             self.open_main_interface()
         else:
-            print("Đăng nhập thất bại!")
+            speak("Đăng nhập thất bại!")
 
     def read_text_on_input(self, text):
         """Đọc to từng ký tự khi người dùng nhập"""
@@ -219,7 +219,7 @@ class Register(QtWidgets.QDialog):
         self.register_btn.setText(_translate("Dialog", "ĐĂNG KÝ"))
 
     def create_new_user(self, username, password):
-        return db.create_new_user(user, password)
+        return db.create_new_user(username, password)
 
     def handle_register(self):
         username = self.acc.text()
@@ -233,9 +233,9 @@ class Register(QtWidgets.QDialog):
                 self.Dialog.hide()
                 self.open_main_interface()
             else:
-                print(f"Đã có tài khoản {username}. Vui lòng thử tên khác.")
+                speak(f"Đã có tài khoản {username}. Vui lòng thử tên khác.")
         else:
-            print("Vui lòng nhập đầy đủ thông tin!")
+            speak("Vui lòng nhập đầy đủ thông tin!")
 
     def read_text_on_input(self, text):
         """Đọc to từng ký tự khi người dùng nhập"""
@@ -269,10 +269,10 @@ def main():
     username, password = load_user_data()
 
     if username and password:
-        speak(f"Bạn đã có tài khoản tên là {username}. Bạn có muốn đăng nhập vào tài khoản này không? nói phải rồi để đăng nhập nói không phải để đăng ký tài khoản khác hoặc là nói tôi muốn đăng nhập tài khoản khác để đăng nhập")
+        speak(f"Bạn đã có tài khoản tên là {username}. Bạn có muốn đăng nhập vào tài khoản này không? nói phải rồi để đăng nhập nói không phải để đăng ký tài khoản khác hoặc là nói tôi muốn đăng nhập")
         response = check()
 
-        if response == "tôi muốn đăng nhập tài khoản khác":
+        if response == "tôi muốn đăng nhập":
             update_json("username", "", "config/private.json")
             update_json("password", "", "config/private.json")
             login = Login()

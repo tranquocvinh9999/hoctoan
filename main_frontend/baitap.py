@@ -72,8 +72,7 @@ def recognize_speech():
             return None
 class Ui_Dialog(QtCore.QObject):
     check_finished = QtCore.pyqtSignal(bool, str)
-    # def __init__(self):  
-    #     self.username = self.load_username()
+    # def __init__(self):   
 
     def load_username(self):
         with open("config/private.json") as f:
@@ -87,7 +86,7 @@ class Ui_Dialog(QtCore.QObject):
         Dialog.setWindowTitle("Kiểm Tra Câu Hỏi")
         Dialog.showFullScreen()
         Dialog.setStyleSheet("background-color: #f0f0f0;")
-        
+        self.username = self.load_username()
         self.mouse_filter = self.MouseEventFilter()
 
         self.setup_ui_elements(Dialog)
@@ -248,6 +247,7 @@ class Ui_Dialog(QtCore.QObject):
 
             self.selected_chapter = new_question_name
             generate_questions_from_a_name_AI(self.selected_chapter, 3)
+            db.reset_pratice_chapter(self.selected_chapter)
             self.load_questions()
         else:
             speak("Không thể nhận diện tên bài tập. Vui lòng thử lại.")
@@ -306,8 +306,9 @@ class Ui_Dialog(QtCore.QObject):
 
         self.selected_chapter = chapter_name
         speak(f"Bạn đã chọn chương: {self.selected_chapter}")
-        self.chapter_menu_dialog.close()  # Đóng cửa sổ menu
+        self.chapter_menu_dialog.close() 
         generate_questions_from_a_name_AI(self.selected_chapter, 3)
+        db.reset_pratice_chapter(self.selected_chapter)
         self.load_questions()
 
     def load_questions(self, current_question_text=None):
@@ -361,7 +362,7 @@ class Ui_Dialog(QtCore.QObject):
         question = question.replace('=', '').replace('?', '').strip()
     
         # Tách các thành phần của câu hỏi: số, toán tử và từ chữ
-        components = re.findall(r'[\d\-]+|[\+\-\*/]|[a-zA-Zàáạảãâầấậẩẫăằắặẳẵêềếệểễíìíịỉĩóòóọỏõôồốộổỗơờớợởỡùủũụưừứựửữýỳýỵỷỹđ]+', question)
+        components = re.findall(r'[\d\-]+|[\+\-\*/]|[a-zA-Zàáạảãâầấậẩẫăằắặẳẵêềếệểễíìíịỉĩóòóọỏõôồốộổỗơờớợởỡùủũúụưừứựửữýỳýỵỷỹđ]+', question)
     
         # Chuyển đổi các toán tử thành từ tương ứng
         operators = {'+': 'cộng', '-': 'trừ', '*': 'nhân', '/': 'chia'}
@@ -409,18 +410,18 @@ class Ui_Dialog(QtCore.QObject):
         self.checkbutton.setDisabled(True)
         speak("bạn đã nhấn kiểm tra câu trả lời hãy chờ nhé")
         user_answer = self.nhapketqua.text().strip() 
-        correct_answer = self.cauhoi_dict[self.current_question]["answer"].strip() 
-
-        if correct_answer.lower() in ["có", "yes", "y", "phai"]:
+        # correct_answer = self.cauhoi_dict[self.current_question]["answer"].strip() 
+        correct_answer = self.questions[self.current_question]["answer"].strip()
+        if correct_answer.lower() in ["có", "yes", "y", "phai", "dung"]:
             user_answer = "phải"
-        elif correct_answer.lower() in ["không", "no", "n", "khong"]:
+        elif correct_answer.lower() in ["không", "no", "n", "khong", "sai"]:
             user_answer = "không"
         elif correct_answer.lower() in ["lon hon", "lớn hơn"]:
             user_answer = user_answer.replace("lon hon", ">")
         elif correct_answer.lower() in ["be hon", "bé hơn"]:
             user_answer =  user_answer.replace("be hon", "<")
 
-        is_correct, feedback = check_question_AI(self.cauhoi_dict[self.current_question]["question"], correct_answer, user_answer)
+        is_correct, feedback = check_question_AI(self.questions[self.current_question], correct_answer, user_answer)
 
         if is_correct:
             self.correct_answers += 1
@@ -516,11 +517,3 @@ class Ui_Dialog(QtCore.QObject):
             self.back_button.click()
 
 # fix phần đọc dấu
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())
-    app.installEventFilter(MouseEventFilter())

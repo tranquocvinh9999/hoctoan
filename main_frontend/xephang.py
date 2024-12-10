@@ -3,11 +3,7 @@ import requests
 from functions.resource_path.path import resource_path
 import json
 from database.database import *
-file_pathss = resource_path("ip_host.json")
-with open(file_pathss) as f:
-    settings = json.load(f)
-    ip = settings["ip"]
-    port = settings["port"]
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")

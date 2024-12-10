@@ -182,7 +182,8 @@ def sort_leaderboard():
     return sorted_data
 
 def get_all_questions_by_chapter(chapter):
-    return questions_collection.find_all({"chapter" : chapter})
+    return list(questions_collection.find({"chapter": chapter}))
+
 
 def insert_new_question(chapter, question, answer):
     if not chapter or not question or not answer:
@@ -197,3 +198,6 @@ def insert_new_question(chapter, question, answer):
 
 def get_all_chapter():
     return questions_collection.distinct("chapter")
+
+def reset_pratice_chapter(chapter): 
+    questions_collection.delete_many({"chapter": chapter})

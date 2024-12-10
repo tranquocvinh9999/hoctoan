@@ -9,11 +9,6 @@ from functions.resource_path.path import resource_path
 import json
 import database.database as db
 
-file_pathss = resource_path("ip_host.json")
-with open(file_pathss) as f:
-    settings = json.load(f)
-    ip = settings["ip"]
-    port = settings["port"]
 
 class DragDropWidget(QtWidgets.QWidget):
     def __init__(self):
