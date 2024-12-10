@@ -223,7 +223,7 @@ class Ui_Dialog(QtCore.QObject):
                 self.questions = data["question"]
                 self.socasai.display(self.incorrect_answers)
                 self.socaudung.display(self.correct_answers)
-                print(self.current_question)
+                print(f"existing current question: {self.current_question}")
                 speak(f"Tìm thấy bài tập đang làm trong chương {self.selected_chapter}. Tiếp tục từ câu hỏi số {self.current_question + 1}.")
                 self.load_questions(data["question"])
                 return True
@@ -329,10 +329,6 @@ class Ui_Dialog(QtCore.QObject):
                         print(f"index: {idx}")
                         print(f"current questions: {self.current_question}")
                         break
-                else:
-                    # Nếu không tìm thấy câu hỏi tương ứng
-                    speak(f"Câu hỏi '{current_question_text}' không được tìm thấy.")
-                    return  # Dừng hàm nếu không tìm thấy câu hỏi
 
             # Hiển thị câu hỏi và kích hoạt button
             self.show_question()
@@ -447,6 +443,13 @@ class Ui_Dialog(QtCore.QObject):
         
     def save_current_state(self):
         username = self.get_username()
+
+        if(self.current_question >= len(self.questions)):
+            speak("Ban da hoan thanh chuong nay")
+            self.back_button.click()
+            return
+        # print(f"questions: {self.questions}")
+        # print(f"current questinos: {self.current_question}")
 
         if db.update_current_exercise_by_username(
             username, 
