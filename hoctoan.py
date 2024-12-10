@@ -106,6 +106,8 @@ class Login(QtWidgets.QDialog):
         self.label_2.setText(_translate("Dialog", "TÀI KHOẢN"))
         self.label_3.setText(_translate("Dialog", "MẬT KHẨU"))
         self.checkloggin.setText(_translate("Dialog", "ĐĂNG NHẬP"))
+    def check_user_password(username, password):
+        return db.check_user_passw(users, password)
 
     def handle_login(self):
         username = self.acc.text()
@@ -118,7 +120,7 @@ class Login(QtWidgets.QDialog):
             self.open_main_interface()
             return
     
-        if req(username, password) == True: 
+        if self.check_user_password(username, password) == True: 
             print("Đăng nhập thành công!")
             update_json("username", username, "config/private.json")
             update_json("password", password, "config/private.json")
@@ -216,12 +218,15 @@ class Register(QtWidgets.QDialog):
         self.label_3.setText(_translate("Dialog", "MẬT KHẨU"))
         self.register_btn.setText(_translate("Dialog", "ĐĂNG KÝ"))
 
+    def create_new_user(self, username, password):
+        return db.create_new_user(user, password)
+
     def handle_register(self):
         username = self.acc.text()
         password = self.passw.text()
 
         if username and password:
-            if new_user(username, password):
+            if self.create_new_user(username, password):
                 speak(f"Đăng ký thành công! Chào mừng {username}")
                 update_json("username", username, "config/private.json")
                 update_json("password", password, "config/private.json")

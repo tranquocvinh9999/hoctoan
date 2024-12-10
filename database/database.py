@@ -29,7 +29,7 @@ def check_user_passw(username, password):
 
 def create_new_user(username, password):
     if users_collection.find_one({"username": username}):
-        return {'error': 'User already exists'}, 400
+        return False
 
     new_user = {
         "username": username,
@@ -57,7 +57,7 @@ def create_new_user(username, password):
     leaderboard_collection.insert_one(new_leaderboard)
     current_exercise_collection.insert_one(new_current_exercise)
 
-    return "ok", 200
+    return True
 
 def update_current_exercise_by_username(username, question, correct, wrong, current, chapter):
     if not username or not question or correct is None or wrong is None or current is None or not chapter:
