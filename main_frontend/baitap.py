@@ -446,21 +446,25 @@ class Ui_Dialog(QtCore.QObject):
         print(correct_answer)  
         self.check_finished.emit(is_correct, feedback) 
 
+    def get_username(self):
+        with open("config/private.json") as f:
+            file_data = json.load(f)
+            username = file_data["username"]
+        return username
         
     def save_current_state(self):
-        file_path = "config/baitapdangdo.json"
-        try:
-            data = {
-                "question": self.cauhoi_dict[self.current_question]["question"],
-                "correct": self.correct_answers,
-                "wrong": self.incorrect_answers,
-                "current": self.current_question,
-                "chapter": self.selected_chapter
-            }
-            with open(file_path, "w", encoding="utf-8") as file:
-                json.dump(data, file, ensure_ascii=False, indent=4)
-        except Exception as e:
-            print(f"Lỗi khi lưu trạng thái: {e}")
+        username = self.get_username()
+
+        if db.update_current_exercise_by_username(
+            username, 
+            self.cauhoi_dict[self.current_question]["question"],
+            self.correct_answers,
+            self.incorrect_answers,
+            self.current_question,
+            self.selected_chapter
+        ) != 200:
+            print("Lỗi khi lưu trạng thái:")
+
     def on_check_finished(self, valid, feedback):
         if valid:
             self.socaudung.display(self.correct_answers)
@@ -475,19 +479,8 @@ class Ui_Dialog(QtCore.QObject):
             speak("Bạn đã hoàn thành bài tập.")
             self.submit_scores()
             self.reset_quiz()
-    def reset_baitapdangdo(self):
-    
-        data = {
-            "question": "",
-            "correct": 0,
-            "wrong": 0,
-            "current": 0,
-            "chapter": ""
-        }
-
-    # Ghi dữ liệu trống hoặc mặc định vào file JSON
-        with open("config/baitapdangdo.json", "w") as f:
-            json.dump(data, f, indent=4)
+    def reset_baitapdangdo(self):  
+        db.reset_current_exercise_by_username(self.get_username())
 
     def reset_quiz(self):
         self.reset_baitapdangdo()
@@ -498,11 +491,8 @@ class Ui_Dialog(QtCore.QObject):
         self.current_question = 0
 
         self.back_button.click()
-    def submit_scores(self):
-        with open("config/private.json") as f:
-            file_data = json.load(f)
-            username = file_data["username"]
-
+    def submit_scores(self): 
+        username = self.get_username()
         data = db.get_scores(username)
 
         a = self.correct_answers 
@@ -514,23 +504,19 @@ class Ui_Dialog(QtCore.QObject):
         new_score = data["user_score"] + 3  
 
         db.submit_scores(new_score, new_correct, new_wrong, username)
+
     def go_back(self):
         speak("Quay lại.")
     def clear_baitapdangdo_file():
-        file_path = "config/baitapdangdo.json"
-        if os.path.exists(file_path):
-            try:
-                with open(file_path, "w", encoding="utf-8") as file:
-                    json.dump({}, file) 
-                speak("Dữ liệu trong file baitapdangdo.json đã được xóa.")
-            except Exception as e:
-                speak(f"Đã xảy ra lỗi khi xóa dữ liệu: {e}")
-        else:
-            speak("File baitapdangdo.json không tồn tại để xóa.")
+        username = self.get_username()
 
+        db.remove_current_exercise_by_username(username)
+        file_path = "config/baitapdangdo.json"
+        speak("Dữ liệu trong bài tập dang dở đã được xóa")
+ 
     def next_question(self):
         self.current_question += 1
-        if self.current_question < len(self.cauhoi_dict):
+        if self.current_question < len(self.cauh oi_dict):
             self.show_question()
         else:
             speak("Bạn đã hoàn thành tất cả các câu hỏi.")

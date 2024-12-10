@@ -13,6 +13,7 @@ db = client["test_database"]
 users_collection = db['users']
 leaderboard_collection = db['leaderboard']
 lectures_collection = db['lectures']
+current_exercise_collection = db['current_exercise']
 
 # Tạo thư mục nếu chưa tồn tại
 baigiang = 'lectures'
@@ -42,9 +43,59 @@ def create_new_user(username, password):
         "rank": ""
     }
 
+    new_current_exercise = {
+        "username" : username,
+        "question": "",
+        "correct": 0,
+        "wrong": 0,
+        "current": 0,
+        "chapter": ""
+    }
+
     users_collection.insert_one(new_user)
     leaderboard_collection.insert_one(new_leaderboard)
+    current_exercise_collection.insert_one(new_current_exercise)
+
     return "ok", 200
+
+def update_current_exercise_by_username(username, question, correct, wrong, current, chapter)
+    if not username or not question or correct is None or wrong is None or current is None or not chapter:
+        return 300
+
+    current_exercise_collection.update_one(
+        {"username" : username},
+        {"$set":{
+            "question" : question,
+            "correct" : correct,
+            "wrong" : wrong,
+            "current" : current,
+            "chapter" : chapter,
+    }})
+
+    return 200
+
+def get_current_exercise_by_username(username):
+    if not username:
+        return "Invalid username"
+
+    return current_exercise_collection.find_one({"username":username})
+
+def reset_current_exercise_by_username(username):
+    current_exercise_collection.update_one(
+        {"username" : username},
+        {"$set":{ 
+            "question": "",
+            "correct": 0,
+            "wrong": 0,
+            "current": 0,
+            "chapter": ""
+ 
+    }})
+    return 200
+
+def remove_current_exercise_by_username(username):
+    current_exercise_collection.delete_one({"username": username})
+    return 200
 
 def submit_scores(name, correct, score, wrong):
     if not name or correct is None or score is None or wrong is None:
