@@ -186,8 +186,8 @@ def get_all_questions_by_chapter(chapter):
 
 
 def insert_new_question(chapter, question, answer):
-    if not chapter or not question or not answer:
-        return 300
+    # if not chapter or not question or not answer:
+    #     return 300
     questions_collection.insert_one({
         "chapter" : chapter,
         "question" : question,

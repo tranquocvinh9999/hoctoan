@@ -12,7 +12,7 @@ def generate_questions_from_a_name_AI(chapter, so_luong_cau_hoi):
     model = genai.GenerativeModel("gemini-1.5-flash")
 
     response = model.generate_content(f"""LƯU Ý ĐẦU TIÊN VÌ HỌC SINH CỦA TÔI LÀ NGƯỜI KHIẾM THỊ NÊN HÃY LÀM CÁC CÂU HỎI NẰM TRONG TẦM KIỂM SOÁT CỦA HỌ,Viết cho tôi các bài tập về tính toán chứ không được viết về kiểm tra lý thuyết nhé,Đây là chương của chủ đề của một bài trong sách toán sáu tên là {chapter} thuộc sách mới KẾT NỐI TRI THỨC 
-của phòng giáo dục Việt Nam bạn hãy viết cho tôi {so_luong_cau_hoi} bài tập về bài đó giúp tôi để tôi cho các học sinh của tôi làm nữa lưu ý các bài tập có định dạng CÂU HỎI:CÂU TRẢ LỜI và lược bỏ các câu trả lời của bạn không cần thiết
+của phòng giáo dục Việt Nam bạn hãy tạo cho tôi 3 bài tập về bài đó giúp tôi để tôi cho các học sinh của tôi làm nữa lưu ý các bài tập có định dạng CÂU HỎI:CÂU TRẢ LỜI và lược bỏ các câu trả lời của bạn không cần thiết
 bỏ các chữ in hoa khi bạn trả về text cho tôi nữa bỏ các chữ như Bài 1 bài 2 và tiếp tục cho đến bài cuối khi bạn trả về tôi chỉ cần mỗi ĐỊNH DẠNH CÂU HỎI:CÂU TRẢ LỜI cho các bài ở dạng tầm bình thường thôi đừng khó quá vì học sinh của tôi là người khiếm thị
 bỏ tiêu đề của các bài bạn trả về đi VÀ TÔI BẮT BUỘC PHẢI lưu ý VÀ CỐ ĐỊNH khi bạn trả về các câu hỏi thì có định dạng là Question:answer để tôi còn có dữ liệu để trả về nữa các câu hỏi và trả lời được ngăn cách nhau bằng kí tự | để tôi có thể phân biệt và lưu nó về file json
 VÀ HÃY CHẮC CHẮN NHỮNG LẦN TRẢ VỀ KẾT QUẢ SAU CỦA BẠN HÃY LÀM GIỐNG NHƯ NÀY độ khó ở mức dễ vì học sinh tôi là người khiếm thị tôi không cần bạn phân tích TÔI CHỈ CẦN BẠN IN BÀI TẬP RA  VÀ CHỈ DÙNG | ĐỂ PHÂN CÁCH GIỮA CÂU HỎI VÀ CÂU TRẢ LỜI KHÔNG DÙNG | ĐỂ PHÂN CÁCH CÁC CÂU HỎI
@@ -33,6 +33,7 @@ VÍ DỤ CÁC CÂU HỎI PHẢI HOẶC KHÔNG PHẢI THÌ CÂU TRẢ LỜI CHỈ
                 question, answer = line.split('|', 1)
                 question = question.replace("Question:", "").strip()
                 answer = answer.strip().replace("Answer:", "").lower().strip()
+                print(chapter, question, answer)
                 db.insert_new_question(chapter, question, answer)
             except ValueError as e:
                 print(f"Lỗi tách câu hỏi và câu trả lời: {e}")

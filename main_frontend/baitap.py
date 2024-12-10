@@ -35,7 +35,7 @@ def check_question_AI(question, answer, user_answer):
             với trường hợp đó. ĐẶC BIỆT NHỚ LÀ CHỈ RÕ ra các câu trả lời sai đó và nói tại sao, 
             chỉ trả về hai giá trị 'Đúng' và 'Sai' thôi không ừm gì hết. 
             Các câu trả lời đúng sai như 'CÓ' hoặc 'KHÔNG' học sinh của tôi trả lời phải hoặc đúng hoặc 2 từ đó không dấu thì nhận diện giúp tôi.HOẶC 'PHẢI' HOẶC 'KHÔNG' MÀ HỌC SINH TÔI TRẢ LỜI 'PHAI' hoặc 'phai' HOẶC 'KHONG' HOẶC 'HONG' thì cũng tính nhé. VÀ HÃY KIỂM TRA KẾT QUẢ CỦA HỌC SINH TÔI NHẬP VỚI KẾT QUẢ ĐÚNG VÌ CÓ MẤY LẦN HỌC SINH TÔI NHẬP ĐÚNG VỚI KẾT QUẢ ĐÚNG THÌ BẠN LẠI BẢO SAI
-            VÍ DỤ CÁC CÂU CÓ DẤU PHẨY (LIỆT KÊ) NHƯ 5, 3, 2, 1 MÀ HỌC SINH TÔI TRẢ LỜI LÀ 5 3 2 1 THÌ BẠN HÃY CHO LÀ ĐÚNG NHÉ VÌ HỌC SINH TÔI CÓ THỂ KHÔNG BIẾT DẤU PHẨY Ở ĐÂU MÀ CHỈ BIẾT DẤU CÁCH THÔI
+            VÍ DỤ CÁC CÂU CÓ DẤU PHẨY (LIỆT KÊ) NHƯ 5, 3, 2, 1 MÀ HỌC SINH TÔI TRẢ LỜI LÀ 5 3 2 1 CÓ CÁC DẤU CÁCH PHÂN BIỆT THÌ BẠN HÃY CHO LÀ ĐÚNG NHÉ VÌ HỌC SINH TÔI CÓ THỂ KHÔNG BIẾT DẤU PHẨY Ở ĐÂU MÀ CHỈ BIẾT DẤU CÁCH THÔI
             """ 
         )
 
@@ -223,6 +223,7 @@ class Ui_Dialog(QtCore.QObject):
                 self.questions = data["question"]
                 self.socasai.display(self.incorrect_answers)
                 self.socaudung.display(self.correct_answers)
+                print(self.current_question)
                 speak(f"Tìm thấy bài tập đang làm trong chương {self.selected_chapter}. Tiếp tục từ câu hỏi số {self.current_question + 1}.")
                 self.load_questions(data["question"])
                 return True
@@ -241,8 +242,7 @@ class Ui_Dialog(QtCore.QObject):
             speak(f"Bạn đã chọn bài tập mới: {new_question_name}")
 
             self.selected_chapter = new_question_name
-            generate_questions_from_a_name_AI(self.selected_chapter, 3)
-            db.reset_pratice_chapter(self.selected_chapter)
+            generate_questions_from_a_name_AI(self.selected_chapter, 1)
             self.load_questions()
         else:
             speak("Không thể nhận diện tên bài tập. Vui lòng thử lại.")
@@ -301,9 +301,9 @@ class Ui_Dialog(QtCore.QObject):
 
         self.selected_chapter = chapter_name
         speak(f"Bạn đã chọn chương: {self.selected_chapter}")
-        self.chapter_menu_dialog.close() 
-        generate_questions_from_a_name_AI(self.selected_chapter, 3)
         db.reset_pratice_chapter(self.selected_chapter)
+        self.chapter_menu_dialog.close() 
+        generate_questions_from_a_name_AI(self.selected_chapter, 1)
         self.load_questions()
 
     def load_questions(self, current_question_text=None):
@@ -313,7 +313,6 @@ class Ui_Dialog(QtCore.QObject):
 
             # # Mở và đọc file câu hỏi
             # with open(question_file, "r", encoding="utf-8") as f:
-            #     self.cauhoi_dict = json.load(f)
             
             # Khởi tạo danh sách câu hỏi
             self.questions = db.get_all_questions_by_chapter(self.selected_chapter)
@@ -322,10 +321,13 @@ class Ui_Dialog(QtCore.QObject):
             self.incorrect_answers = 0
 
             # Nếu có chỉ định câu hỏi hiện tại, tìm kiếm câu hỏi đó
+            print(f"Questions: {self.questions}")
             if current_question_text:
-                for idx, question in enumerate(self.cauhoi_dict):
+                for idx, question in enumerate(self.questions):
                     if question.get("question") == current_question_text:  # Kiểm tra khóa "question"
                         self.current_question = idx
+                        print(f"index: {idx}")
+                        print(f"current questions: {self.current_question}")
                         break
                 else:
                     # Nếu không tìm thấy câu hỏi tương ứng
@@ -386,7 +388,6 @@ class Ui_Dialog(QtCore.QObject):
             self.submit_scores()
             self.cauhoi.setText("Bạn đã hoàn thành tất cả câu hỏi.")
             return
-
         # Lấy câu hỏi hiện tại
         question_data = self.questions[self.current_question]
         question_text = question_data["question"]
@@ -407,13 +408,13 @@ class Ui_Dialog(QtCore.QObject):
         user_answer = self.nhapketqua.text().strip() 
         # correct_answer = self.cauhoi_dict[self.current_question]["answer"].strip() 
         correct_answer = self.questions[self.current_question]["answer"].strip()
-        if correct_answer.lower() in ["có", "yes", "y", "phai", "dung"]:
+        if user_answer.lower() in ["có", "yes", "y", "phai", "dung", "co"]:
             user_answer = "phải"
-        elif correct_answer.lower() in ["không", "no", "n", "khong", "sai"]:
+        elif user_answer.lower() in ["không", "no", "n", "khong", "sai"]:
             user_answer = "không"
-        elif correct_answer.lower() in ["lon hon", "lớn hơn"]:
+        elif user_answer.lower() in ["lon hon", "lớn hơn"]:
             user_answer = user_answer.replace("lon hon", ">")
-        elif correct_answer.lower() in ["be hon", "bé hơn"]:
+        elif user_answer.lower() in ["be hon", "bé hơn"]:
             user_answer =  user_answer.replace("be hon", "<")
 
         is_correct, feedback = check_question_AI(self.questions[self.current_question], correct_answer, user_answer)
@@ -431,10 +432,9 @@ class Ui_Dialog(QtCore.QObject):
         
         self.nhapketqua.clear()
         self.checkbutton.setDisabled(False)
-        self.current_question += 1  
-        self.save_current_state()  
         self.show_question()  
-
+        self.current_question += 1
+        self.save_current_state()
         print(user_answer)  
         print(correct_answer)  
         self.check_finished.emit(is_correct, feedback) 
@@ -450,7 +450,7 @@ class Ui_Dialog(QtCore.QObject):
 
         if db.update_current_exercise_by_username(
             username, 
-            self.cauhoi_dict[self.current_question]["question"],
+            self.questions[self.current_question]["question"],
             self.correct_answers,
             self.incorrect_answers,
             self.current_question,
@@ -470,6 +470,7 @@ class Ui_Dialog(QtCore.QObject):
         else:
             speak("Bạn đã hoàn thành bài tập.")
             self.submit_scores()
+            db.reset_pratice_chapter(self.selected_chapter)
             self.reset_quiz()
 
     def reset_baitapdangdo(self):  
@@ -494,24 +495,15 @@ class Ui_Dialog(QtCore.QObject):
         new_wrong = data["user_fail"] + b
         new_score = data["user_score"] + 3  
 
-        db.submit_scores(new_score, new_correct, new_wrong, username)
+        db.submit_scores(username, new_correct, new_score, new_wrong)
 
     def go_back(self):
         speak("Quay lại.")
-    def clear_baitapdangdo_file():
+    def clear_baitapdangdo_file(self):
         username = self.get_username()
 
         db.remove_current_exercise_by_username(username)
         speak("Dữ liệu trong bài tập dang dở đã được xóa")
  
-    def next_question(self):
-        self.current_question += 1
-        if self.current_question < len(self.cauhoi_dict):
-            self.show_question()
-        else:
-            speak("Bạn đã hoàn thành tất cả các câu hỏi.")
-            self.submit_scores()  
-            self.clear_baitapdangdo_file() 
-            self.back_button.click()
 
 # fix phần đọc dấu
