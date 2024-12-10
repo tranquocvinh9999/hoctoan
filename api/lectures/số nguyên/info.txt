@@ -1,2 +1,0 @@
-File: số nguyên.txt
-Path: lectures\số nguyên\số nguyên.txt

@@ -1,2 +1,0 @@
-File: sus.txt
-Path: lectures\sus\sus.txt

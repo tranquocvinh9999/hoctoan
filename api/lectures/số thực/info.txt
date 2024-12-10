@@ -1,2 +1,0 @@
-File: số thực.txt
-Path: lectures\số thực\số thực.txt

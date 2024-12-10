@@ -1,2 +1,0 @@
-File: số nguyên tố.txt
-Path: lectures\số nguyên tố\số nguyên tố.txt

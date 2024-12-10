@@ -1,2 +1,0 @@
-File: hàm số.txt
-Path: lectures\hàm số\hàm số.txt
