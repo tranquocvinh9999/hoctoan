@@ -1,6 +1,6 @@
 import json
 import requests
-from functions.keyboard.keyboards import speak, nhap_va_noi
+from functions.keyboard.keyboards import speak
 from functions.microphone.micro import recognize_speech, check
 from functions.resource_path.path import resource_path
 # Function to update JSON file
@@ -58,45 +58,3 @@ with open("config/private.json") as f:
     usernames = settings["username"]
     passwords = settings["password"]
 
-
-def regis():
-    speak("Bạn chưa đăng kí tài khoản nào. Hãy đăng kí bằng cách nhập từ bàn phím.")
-    speak("Lưu ý: Tên đăng nhập không có chữ in hoa và kí tự đặc biệt.")
-    user = nhap_va_noi("Nhập tên")
-    password = nhap_va_noi("Nhập mật khẩu")
-    
-    if user.islower() and user.isalnum():
-        update_json("username", user)
-    else:
-        speak("Tên tài khoản có chữ in hoa hoặc kí tự đặc biệt.")
-    
-    if password.islower() and password.isalnum():
-        update_json("password", password, "config/private.json")
-        new_user(user, password, "config/private.json")
-    else:
-        speak("Mật khẩu có chữ in hoa hoặc kí tự đặc biệt.")
-    
-    speak("Hãy thoát phần mềm ra rồi đăng nhập lại.")
-
-
-
-
-
-def recall():
-    speak("Lưu ý: Tài khoản và mật khẩu không được có chữ in hoa và kí tự đặc biệt.")
-    user = nhap_va_noi("Bạn hãy nhập tài khoản.")
-    passw = nhap_va_noi("Bạn hãy nhập mật khẩu.")
-
-    if user and passw:
-        if req(user, passw) == True:
-            speak("Bạn đã đăng nhập thành công.")
-            update_json("username", user, "config/private.json")
-            update_json("password", passw, "config/private.json")
-            update_json("user", user, "config/score.json")
-        else:
-            speak("Có vẻ cả tài khoản và mật khẩu đều sai.")
-            speak("Hãy đăng nhập lại nhé.")
-            recall()
-    else:
-        speak("Có vẻ đã có lỗi gì đó. Hãy đăng nhập lại.")
-        recall()

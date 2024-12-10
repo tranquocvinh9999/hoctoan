@@ -188,7 +188,7 @@ class Ui_Dialog(object):
     #     if lecture_name:
     #         speak(f"Bạn đã chọn bài giảng: {lecture_name}")
     #         self.textBrowser.setPlainText(f"Bài giảng {lecture_name} đang được thêm vào...")
-    #         self.download_file(lecture_name)
+    #         self.(lecture_name)
     #     else:
     #         speak("Không nhận diện được tên bài giảng.")
 

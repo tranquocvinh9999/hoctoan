@@ -59,7 +59,7 @@ def create_new_user(username, password):
 
     return "ok", 200
 
-def update_current_exercise_by_username(username, question, correct, wrong, current, chapter)
+def update_current_exercise_by_username(username, question, correct, wrong, current, chapter):
     if not username or not question or correct is None or wrong is None or current is None or not chapter:
         return 300
 
