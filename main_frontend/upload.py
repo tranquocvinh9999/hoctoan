@@ -14,6 +14,7 @@ with open(file_pathss) as f:
     settings = json.load(f)
     ip = settings["ip"]
     port = settings["port"]
+
 class DragDropWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
