@@ -24,10 +24,8 @@ VÍ DỤ CÁC CÂU HỎI PHẢI HOẶC KHÔNG PHẢI THÌ CÂU TRẢ LỜI CHỈ
     
 
     print(response.text)
-
     lines = response.text.strip().split('\n')
     data = []
-
     for line in lines:
         line = line.strip()
         if '|' in line:
@@ -36,27 +34,10 @@ VÍ DỤ CÁC CÂU HỎI PHẢI HOẶC KHÔNG PHẢI THÌ CÂU TRẢ LỜI CHỈ
                 question = question.replace("Question:", "").strip()
                 answer = answer.strip().replace("Answer:", "").lower().strip()
                 db.insert_new_question(chapter, question, answer)
-                # data.append({
-                #     "question": question,
-                #     "answer": answer
-                # })
             except ValueError as e:
                 print(f"Lỗi tách câu hỏi và câu trả lời: {e}")
         else:
             print(f"Dòng không hợp lệ (không chứa '|'): {line}")
-
-    # json_file_path = f'AI/question_folder/{chapter}/questions.json'  
-
-    # folder_path = os.path.dirname(resource_path(json_file_path))
-    # if not os.path.exists(resource_path(folder_path)):
-    #     os.makedirs(resource_path(folder_path))
-
-    # try:
-    #     with open(resource_path(json_file_path), 'w', encoding='utf-8') as f:
-    #         json.dump(data, f, ensure_ascii=False, indent=4)
-    #     print(f"Các câu hỏi đã được lưu vào {json_file_path}")
-    # except PermissionError as e:
-    #     print(f"Lỗi quyền truy cập khi ghi vào tệp: {e}")
 
 
 

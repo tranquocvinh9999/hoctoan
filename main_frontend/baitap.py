@@ -75,7 +75,7 @@ class Ui_Dialog(QtCore.QObject):
     def __init__(self):  
         self.username = self.load_username()
 
-    def load_username():
+    def load_username(self):
         with open("config/private.json") as f:
             file_data = json.load(f)
             username = file_data["username"]
@@ -507,7 +507,7 @@ class Ui_Dialog(QtCore.QObject):
  
     def next_question(self):
         self.current_question += 1
-        if self.current_question < len(self.cauh oi_dict):
+        if self.current_question < len(self.cauhoi_dict):
             self.show_question()
         else:
             speak("Bạn đã hoàn thành tất cả các câu hỏi.")
