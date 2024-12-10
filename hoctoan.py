@@ -117,6 +117,7 @@ class Login(QtWidgets.QDialog):
             self.Dialog.hide()
             self.open_main_interface()
             return
+    
         if req(username, password) == True: 
             print("Đăng nhập thành công!")
             update_json("username", username, "config/private.json")

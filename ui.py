@@ -14,6 +14,7 @@ with open(file_pathss) as f:
     settings = json.load(f)
     user = settings["username"]
     password = settings["password"]
+
 class Ui_Qdialog(object):
     def __init__(self):
         self.user_account = 0

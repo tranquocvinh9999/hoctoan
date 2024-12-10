@@ -24,8 +24,8 @@ if not os.path.exists(baigiang):
 def check_user_passw(username, password):
     user = users_collection.find_one({"username": username})
     if not user:
-        return False, False
-    return True, user['password'] == password
+        return False
+    return True and user['password'] == password
 
 def create_new_user(username, password):
     if users_collection.find_one({"username": username}):
