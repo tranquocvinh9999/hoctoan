@@ -94,7 +94,7 @@ class Ui_Qdialog(object):
         main_dialog.hide() 
         self.dialog = QtWidgets.QDialog()
         ui = ui_class()
-        ui.setupUi(self.dialog, main_dialog)  
+        ui.setupUi(self.dialog, main_dialog)
         if hasattr(ui, 'back_button'):
             ui.back_button.clicked.connect(lambda: self.back_to_main_menu(main_dialog))
     

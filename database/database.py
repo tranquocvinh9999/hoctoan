@@ -8,7 +8,7 @@ import gridfs
 load_dotenv()
 
 # Kết nối MongoDB, database connection
-client = MongoClient(f"{os.getenv('DATABASE_URL')}")
+client = MongoClient(f"{os.getenv('DATABASE_URL')}", tls=True)
 db = client["test_database"]
 users_collection = db['users']
 leaderboard_collection = db['leaderboard']
