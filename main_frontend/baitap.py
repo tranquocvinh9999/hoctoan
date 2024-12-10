@@ -215,6 +215,7 @@ class Ui_Dialog(QtCore.QObject):
         self.thread = VoiceRecognitionThread()
         self.thread.recognized_text.connect(self.process_recognized_text)
         self.thread.start()
+
     def check_existing_questions(self):
         file_path = "config/baitapdangdo.json"
         if os.path.exists(file_path):

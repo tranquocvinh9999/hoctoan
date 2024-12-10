@@ -113,6 +113,7 @@ class Ui_Dialog(object):
     def load_available_lectures(self): 
         lectures = db.find_all_lecture()
 
+        # print(list(lectures))
         for lecture in lectures:
             lecture_name = lecture['name']
             button = QtWidgets.QPushButton(lecture_name)
