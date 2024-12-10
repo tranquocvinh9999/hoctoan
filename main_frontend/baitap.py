@@ -47,21 +47,6 @@ def check_question_AI(question, answer, user_answer):
     
     return False, "Đã xảy ra lỗi khi kiểm tra câu trả lời."
 import requests
-from functions.resource_path.path import resource_path
-file_pathss = resource_path("ip_host.json")
-with open(file_pathss) as f:
-    settings = json.load(f)
-    ip = settings["ip"]
-    port = settings["port"]
-def send_data(score, correct, wrong, username):
-    url = f"http://{ip}:{port}/scores"
-    data = {
-        "name": username,
-        "correct": correct,
-        "score": score,
-        "wrong": wrong
-    }
-    res = requests.post(url, json=data)
 
 def recognize_speech():
     recognizer = sr.Recognizer()
