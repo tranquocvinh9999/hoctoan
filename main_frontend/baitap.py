@@ -9,6 +9,7 @@ import google.generativeai as genai
 from functions.microphone.micro import check
 from AI.bot import generate_questions_from_a_name_AI
 import database.database  as db
+import requests
 
 API_KEY = 'AIzaSyAxoki6CsXdtMdWuSEwyXQ4tUGDNOLCIGA'
 import re
@@ -46,7 +47,6 @@ def check_question_AI(question, answer, user_answer):
         print(f"Error during API call: {e}")
     
     return False, "Đã xảy ra lỗi khi kiểm tra câu trả lời."
-import requests
 
 def recognize_speech():
     recognizer = sr.Recognizer()
@@ -72,6 +72,14 @@ def recognize_speech():
             return None
 class Ui_Dialog(QtCore.QObject):
     check_finished = QtCore.pyqtSignal(bool, str)
+    def __init__(self):  
+        self.username = self.load_username()
+
+    def load_username():
+        with open("config/private.json") as f:
+            file_data = json.load(f)
+            username = file_data["username"]
+        return username
 
     def setupUi(self, Dialog, main_dialog=None):
         self.questions = []  # Initialize questions as an empty list
@@ -202,35 +210,34 @@ class Ui_Dialog(QtCore.QObject):
         self.thread.start()
 
     def check_existing_questions(self):
-        file_path = "config/baitapdangdo.json"
-        if os.path.exists(file_path):
-            try:
-                with open(file_path, "r", encoding="utf-8") as file:
-                    data = json.load(file)
 
-                if "question" in data and data["question"]:
-                    self.selected_chapter = data["chapter"]
-                    self.correct_answers = data["correct"]
-                    self.incorrect_answers = data["wrong"]
-                    self.current_question = data["current"]
-                    self.questions = data["question"]
-                    self.socasai.display(self.incorrect_answers)
-                    self.socaudung.display(self.correct_answers)
-                    speak(f"Tìm thấy bài tập đang làm trong chương {self.selected_chapter}. Tiếp tục từ câu hỏi số {self.current_question + 1}.")
-                    self.load_questions(data["question"])
-                    return True
-            except Exception as e:
-                print(f"Error loading questions: {e}")
+        username = self.get_username()
+
+        data = db.get_current_exercise_by_username(username)
+        
+        if data is not None:
+            if "question" in data and data["question"]:
+                self.selected_chapter = data["chapter"]
+                self.correct_answers = data["correct"]
+                self.incorrect_answers = data["wrong"]
+                self.current_question = data["current"]
+                self.questions = data["question"]
+                self.socasai.display(self.incorrect_answers)
+                self.socaudung.display(self.correct_answers)
+                speak(f"Tìm thấy bài tập đang làm trong chương {self.selected_chapter}. Tiếp tục từ câu hỏi số {self.current_question + 1}.")
+                self.load_questions(data["question"])
+                return True
         return False
 
 
 
     def fetch_chapters(self):
-        chapters = []
-        for folder in os.listdir("AI/question_folder"):
-            if os.path.isdir(os.path.join("AI/question_folder", folder)):
-                chapters.append(folder)
-        return chapters
+        # chapters = []
+        # for folder in os.listdir("AI/question_folder"):
+        #     if os.path.isdir(os.path.join("AI/question_folder", folder)):
+        #         chapters.append(folder)
+        # return chapters
+        return db.get_all_chapter()
 
     def add_new_question(self):
         speak("Xin hãy đọc tên bài tập mới.")
@@ -305,31 +312,31 @@ class Ui_Dialog(QtCore.QObject):
 
     def load_questions(self, current_question_text=None):
         try:
-        # Đường dẫn tới file câu hỏi
-            question_file = f"AI/question_folder/{self.selected_chapter}/questions.json"
+            # # Đường dẫn tới file câu hỏi
+            # question_file = f"AI/question_folder/{self.selected_chapter}/questions.json"
 
-        # Mở và đọc file câu hỏi
-            with open(question_file, "r", encoding="utf-8") as f:
-                self.cauhoi_dict = json.load(f)
-
-        # Khởi tạo danh sách câu hỏi
-            self.questions = self.cauhoi_dict
+            # # Mở và đọc file câu hỏi
+            # with open(question_file, "r", encoding="utf-8") as f:
+            #     self.cauhoi_dict = json.load(f)
+            
+            # Khởi tạo danh sách câu hỏi
+            self.questions = db.get_all_questions_by_chapter(self.selected_chapter)
             self.current_question = 0
             self.correct_answers = 0
             self.incorrect_answers = 0
 
-        # Nếu có chỉ định câu hỏi hiện tại, tìm kiếm câu hỏi đó
+            # Nếu có chỉ định câu hỏi hiện tại, tìm kiếm câu hỏi đó
             if current_question_text:
                 for idx, question in enumerate(self.cauhoi_dict):
                     if question.get("question") == current_question_text:  # Kiểm tra khóa "question"
                         self.current_question = idx
                         break
                 else:
-                # Nếu không tìm thấy câu hỏi tương ứng
+                    # Nếu không tìm thấy câu hỏi tương ứng
                     speak(f"Câu hỏi '{current_question_text}' không được tìm thấy.")
                     return  # Dừng hàm nếu không tìm thấy câu hỏi
 
-        # Hiển thị câu hỏi và kích hoạt button
+            # Hiển thị câu hỏi và kích hoạt button
             self.show_question()
             self.checkbutton.setEnabled(True)
 
@@ -347,21 +354,25 @@ class Ui_Dialog(QtCore.QObject):
                 speak("dấu cách")
             else:
                 speak(f"{last_char}")
+
     def format_question_to_speech(self, question):
-    # Loại bỏ các ký tự không cần thiết và giữ nguyên dấu
+        # Loại bỏ các ký tự không cần thiết và giữ nguyên dấu
         question = question.strip()
         question = question.replace('=', '').replace('?', '').strip()
     
-    # Tách các thành phần của câu hỏi: số, toán tử và từ chữ
+        # Tách các thành phần của câu hỏi: số, toán tử và từ chữ
         components = re.findall(r'[\d\-]+|[\+\-\*/]|[a-zA-Zàáạảãâầấậẩẫăằắặẳẵêềếệểễíìíịỉĩóòóọỏõôồốộổỗơờớợởỡùủũụưừứựửữýỳýỵỷỹđ]+', question)
     
-    # Xử lý các số âm
-        for i in range(len(components)):
-            if components[i].startswith('-'):
-                components[i] = f"âm {components[i][1:]}"  # Đọc số âm
-
-    # Chuyển đổi các toán tử thành từ tương ứng
+        # Chuyển đổi các toán tử thành từ tương ứng
         operators = {'+': 'cộng', '-': 'trừ', '*': 'nhân', '/': 'chia'}
+        
+        # Xử lý các số âm
+        for i in range(len(components)):
+            #If i is not the last element
+            if i < len(components) - 1:
+                if (components[i].startswith('-') and components[i + 1] not in operators) :
+                    components[i] = f"âm {components[i][1:]}"  # Đọc số âm
+
         spoken_question = ""
     
         for comp in components:
@@ -373,19 +384,19 @@ class Ui_Dialog(QtCore.QObject):
         return spoken_question.strip()
 
     def show_question(self):
-    # Kiểm tra nếu không còn câu hỏi nào
+        # Kiểm tra nếu không còn câu hỏi nào
         if self.current_question >= len(self.questions):
             speak("Bạn đã hoàn thành chương này. Chúc mừng!")
             self.submit_scores()
             self.cauhoi.setText("Bạn đã hoàn thành tất cả câu hỏi.")
             return
 
-    # Lấy câu hỏi hiện tại
+        # Lấy câu hỏi hiện tại
         question_data = self.questions[self.current_question]
         question_text = question_data["question"]
         self.cauhoi.setText(question_text)
 
-    # Xử lý và làm sạch câu hỏi để đọc
+        # Xử lý và làm sạch câu hỏi để đọc
         question_text_cleaned = question_text.strip().replace('=', '').replace('?', '').replace(' ', '')
         print(question_text_cleaned)
         self.cauhoi.setAccessibleDescription(question_text)
@@ -393,6 +404,7 @@ class Ui_Dialog(QtCore.QObject):
         spoken_question = self.format_question_to_speech(question_text)
         print(f"Đọc câu hỏi: {spoken_question}")  # In ra câu hỏi để kiểm tra
         speak(f"Câu hỏi là: {spoken_question}")
+
     def check_answer(self):
         self.checkbutton.setDisabled(True)
         speak("bạn đã nhấn kiểm tra câu trả lời hãy chờ nhé")
@@ -432,10 +444,7 @@ class Ui_Dialog(QtCore.QObject):
         self.check_finished.emit(is_correct, feedback) 
 
     def get_username(self):
-        with open("config/private.json") as f:
-            file_data = json.load(f)
-            username = file_data["username"]
-        return username
+        return self.username
         
     def save_current_state(self):
         username = self.get_username()
@@ -457,25 +466,23 @@ class Ui_Dialog(QtCore.QObject):
             self.socasai.display(self.incorrect_answers)
         self.checkbutton.setDisabled(False)
 
-
         if self.current_question < len(self.questions):
             self.show_question()
         else:
             speak("Bạn đã hoàn thành bài tập.")
             self.submit_scores()
             self.reset_quiz()
+
     def reset_baitapdangdo(self):  
         db.reset_current_exercise_by_username(self.get_username())
 
     def reset_quiz(self):
         self.reset_baitapdangdo()
-
-
         self.correct_answers = 0
         self.incorrect_answers = 0
         self.current_question = 0
-
         self.back_button.click()
+
     def submit_scores(self): 
         username = self.get_username()
         data = db.get_scores(username)
@@ -496,7 +503,6 @@ class Ui_Dialog(QtCore.QObject):
         username = self.get_username()
 
         db.remove_current_exercise_by_username(username)
-        file_path = "config/baitapdangdo.json"
         speak("Dữ liệu trong bài tập dang dở đã được xóa")
  
     def next_question(self):

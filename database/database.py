@@ -14,6 +14,7 @@ users_collection = db['users']
 leaderboard_collection = db['leaderboard']
 lectures_collection = db['lectures']
 current_exercise_collection = db['current_exercise']
+questions_collection = db['questions']
 
 # Tạo thư mục nếu chưa tồn tại
 baigiang = 'lectures'
@@ -180,9 +181,19 @@ def sort_leaderboard():
     )
     return sorted_data
 
+def get_all_questions_by_chapter(chapter):
+    return questions_collection.find_all({"chapter" : chapter})
 
-# if __name__ == "__main__":
-# #    insert_new_lecture()
-# #    find_lecture_by_name()
-# #    insert_new_lecture("so nguyen to","số nguyên tố là số chia hết cho một và chính nó")
-#    print(find_lecture_by_name("so nguyen to"))
+def insert_new_question(chapter, question, answer):
+    if not chapter or not question or not answer:
+        return 300
+    questions_collection.insert_one({
+        "chapter" : chapter,
+        "question" : question,
+        "answer" : answer,
+    })
+
+    return 200
+
+def get_all_chapter():
+    return questions_collection.distinct("chapter")

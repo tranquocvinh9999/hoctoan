@@ -4,14 +4,14 @@ import google.generativeai as genai
 import os
 import json
 from functions.resource_path.path import resource_path
+import database.database as db
 
-
-def generate_questions_from_a_name_AI(name, so_luong_cau_hoi):
+def generate_questions_from_a_name_AI(chapter, so_luong_cau_hoi):
 
     genai.configure(api_key="AIzaSyAxoki6CsXdtMdWuSEwyXQ4tUGDNOLCIGA")
     model = genai.GenerativeModel("gemini-1.5-flash")
 
-    response = model.generate_content(f"""LƯU Ý ĐẦU TIÊN VÌ HỌC SINH CỦA TÔI LÀ NGƯỜI KHIẾM THỊ NÊN HÃY LÀM CÁC CÂU HỎI NẰM TRONG TẦM KIỂM SOÁT CỦA HỌ,Viết cho tôi các bài tập về tính toán chứ không được viết về kiểm tra lý thuyết nhé,Đây là chương của chủ đề của một bài trong sách toán sáu tên là {name} thuộc sách mới KẾT NỐI TRI THỨC 
+    response = model.generate_content(f"""LƯU Ý ĐẦU TIÊN VÌ HỌC SINH CỦA TÔI LÀ NGƯỜI KHIẾM THỊ NÊN HÃY LÀM CÁC CÂU HỎI NẰM TRONG TẦM KIỂM SOÁT CỦA HỌ,Viết cho tôi các bài tập về tính toán chứ không được viết về kiểm tra lý thuyết nhé,Đây là chương của chủ đề của một bài trong sách toán sáu tên là {chapter} thuộc sách mới KẾT NỐI TRI THỨC 
 của phòng giáo dục Việt Nam bạn hãy viết cho tôi {so_luong_cau_hoi} bài tập về bài đó giúp tôi để tôi cho các học sinh của tôi làm nữa lưu ý các bài tập có định dạng CÂU HỎI:CÂU TRẢ LỜI và lược bỏ các câu trả lời của bạn không cần thiết
 bỏ các chữ in hoa khi bạn trả về text cho tôi nữa bỏ các chữ như Bài 1 bài 2 và tiếp tục cho đến bài cuối khi bạn trả về tôi chỉ cần mỗi ĐỊNH DẠNH CÂU HỎI:CÂU TRẢ LỜI cho các bài ở dạng tầm bình thường thôi đừng khó quá vì học sinh của tôi là người khiếm thị
 bỏ tiêu đề của các bài bạn trả về đi VÀ TÔI BẮT BUỘC PHẢI lưu ý VÀ CỐ ĐỊNH khi bạn trả về các câu hỏi thì có định dạng là Question:answer để tôi còn có dữ liệu để trả về nữa các câu hỏi và trả lời được ngăn cách nhau bằng kí tự | để tôi có thể phân biệt và lưu nó về file json
@@ -35,27 +35,28 @@ VÍ DỤ CÁC CÂU HỎI PHẢI HOẶC KHÔNG PHẢI THÌ CÂU TRẢ LỜI CHỈ
                 question, answer = line.split('|', 1)
                 question = question.replace("Question:", "").strip()
                 answer = answer.strip().replace("Answer:", "").lower().strip()
-                data.append({
-                    "question": question,
-                    "answer": answer
-                })
+                db.insert_new_question(chapter, question, answer)
+                # data.append({
+                #     "question": question,
+                #     "answer": answer
+                # })
             except ValueError as e:
                 print(f"Lỗi tách câu hỏi và câu trả lời: {e}")
         else:
             print(f"Dòng không hợp lệ (không chứa '|'): {line}")
 
-    json_file_path = f'AI/question_folder/{name}/questions.json'  
+    # json_file_path = f'AI/question_folder/{chapter}/questions.json'  
 
-    folder_path = os.path.dirname(resource_path(json_file_path))
-    if not os.path.exists(resource_path(folder_path)):
-        os.makedirs(resource_path(folder_path))
+    # folder_path = os.path.dirname(resource_path(json_file_path))
+    # if not os.path.exists(resource_path(folder_path)):
+    #     os.makedirs(resource_path(folder_path))
 
-    try:
-        with open(resource_path(json_file_path), 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-        print(f"Các câu hỏi đã được lưu vào {json_file_path}")
-    except PermissionError as e:
-        print(f"Lỗi quyền truy cập khi ghi vào tệp: {e}")
+    # try:
+    #     with open(resource_path(json_file_path), 'w', encoding='utf-8') as f:
+    #         json.dump(data, f, ensure_ascii=False, indent=4)
+    #     print(f"Các câu hỏi đã được lưu vào {json_file_path}")
+    # except PermissionError as e:
+    #     print(f"Lỗi quyền truy cập khi ghi vào tệp: {e}")
 
 
 
