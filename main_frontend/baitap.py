@@ -231,11 +231,6 @@ class Ui_Dialog(QtCore.QObject):
 
 
     def fetch_chapters(self):
-        # chapters = []
-        # for folder in os.listdir("AI/question_folder"):
-        #     if os.path.isdir(os.path.join("AI/question_folder", folder)):
-        #         chapters.append(folder)
-        # return chapters
         return db.get_all_chapter()
 
     def add_new_question(self):
@@ -445,7 +440,10 @@ class Ui_Dialog(QtCore.QObject):
         self.check_finished.emit(is_correct, feedback) 
 
     def get_username(self):
-        return self.username
+        with open("config/private.json") as f:
+            file_data = json.load(f)
+            username = file_data["username"]
+        return username
         
     def save_current_state(self):
         username = self.get_username()
