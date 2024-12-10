@@ -4,9 +4,9 @@ import json
 import requests
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functions.microphone.micro import check
-from functions.login_register.logn import new_user
-from functions.login_register.logn import update_json
-from functions.login_register.logn import req
+import database.database as db
+
+from functions.update.update import update_json
 from ui import Ui_Qdialog
 from functions.resource_path.path import resource_path
 yeucau = [
@@ -107,7 +107,7 @@ class Login(QtWidgets.QDialog):
         self.label_3.setText(_translate("Dialog", "MẬT KHẨU"))
         self.checkloggin.setText(_translate("Dialog", "ĐĂNG NHẬP"))
     def check_user_password(username, password):
-        return db.check_user_passw(users, password)
+        return db.check_user_passw(username, password)
 
     def handle_login(self):
         username = self.acc.text()
