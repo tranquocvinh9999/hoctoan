@@ -6,20 +6,40 @@ import json
 from functions.resource_path.path import resource_path
 import database.database as db
 
-def generate_questions_from_a_name_AI(chapter, so_luong_cau_hoi):
+def generate_questions_from_a_name_AI(chapter, soluong, dokho):
 
-    genai.configure(api_key="AIzaSyAxoki6CsXdtMdWuSEwyXQ4tUGDNOLCIGA")
+    genai.configure(api_key="AIzaSyAtRaqjHzf1AgEaDK7qTC0HH62sk7Jp48Y")
     model = genai.GenerativeModel("gemini-1.5-flash")
 
-    response = model.generate_content(f"""LƯU Ý ĐẦU TIÊN VÌ HỌC SINH CỦA TÔI LÀ NGƯỜI KHIẾM THỊ NÊN HÃY LÀM CÁC CÂU HỎI NẰM TRONG TẦM KIỂM SOÁT CỦA HỌ,Viết cho tôi các bài tập về tính toán chứ không được viết về kiểm tra lý thuyết nhé,Đây là chương của chủ đề của một bài trong sách toán sáu tên là {chapter} thuộc sách mới KẾT NỐI TRI THỨC 
-của phòng giáo dục Việt Nam bạn hãy tạo cho tôi 3 bài tập về bài đó giúp tôi để tôi cho các học sinh của tôi làm nữa lưu ý các bài tập có định dạng CÂU HỎI:CÂU TRẢ LỜI và lược bỏ các câu trả lời của bạn không cần thiết
-bỏ các chữ in hoa khi bạn trả về text cho tôi nữa bỏ các chữ như Bài 1 bài 2 và tiếp tục cho đến bài cuối khi bạn trả về tôi chỉ cần mỗi ĐỊNH DẠNH CÂU HỎI:CÂU TRẢ LỜI cho các bài ở dạng tầm bình thường thôi đừng khó quá vì học sinh của tôi là người khiếm thị
-bỏ tiêu đề của các bài bạn trả về đi VÀ TÔI BẮT BUỘC PHẢI lưu ý VÀ CỐ ĐỊNH khi bạn trả về các câu hỏi thì có định dạng là Question:answer để tôi còn có dữ liệu để trả về nữa các câu hỏi và trả lời được ngăn cách nhau bằng kí tự | để tôi có thể phân biệt và lưu nó về file json
-VÀ HÃY CHẮC CHẮN NHỮNG LẦN TRẢ VỀ KẾT QUẢ SAU CỦA BẠN HÃY LÀM GIỐNG NHƯ NÀY độ khó ở mức dễ vì học sinh tôi là người khiếm thị tôi không cần bạn phân tích TÔI CHỈ CẦN BẠN IN BÀI TẬP RA  VÀ CHỈ DÙNG | ĐỂ PHÂN CÁCH GIỮA CÂU HỎI VÀ CÂU TRẢ LỜI KHÔNG DÙNG | ĐỂ PHÂN CÁCH CÁC CÂU HỎI
-VÀ  BẮT BUỘC HÃY CỐ ĐỊNH RẰNG NÓ CÓ ĐỊNH DẠNG QUESTIONS: | ANSWER: BỎ CÁC DẤU * ĐI DẤU | NÊN ĐƯỢC CÁC RA DẤU CÁCH NHỎ ĐỂ MÁY TÔI CÓ THỂ PHÂN BIỆT VÀ TẢI VỀ, LƯU Ý ĐẶC BIỆT HỌC SINH CỦA TÔI LÀ NGƯỜI KHIÊM THỊ HỌ KHÔNG THỂ LÀM CÁC BÀI TOÁN KHÓ BẠN HÃY ĐƯA RA CÁC BÀI TOÁN ĐƠN GIẢN VÀ KHÔNG DÀI DÒNG Ở CÂU TRẢ LỜI, BỎ CÁC CÂU HỎI TẠI SAO
-VÀ BẠN TẠO CÂU HỎI LÀM SAO ĐỂ CÂU TRẢ LỜI NGẮN NHẤT CÓ THỂ VÀ DỄ DÀNG NHẤT CỰC KÌ LƯU Ý CÁC CÂU HỎI CÓ MANG TÍNH TỰ LUẬN DÀI THÌ KHÔNG ĐƯỢC THÊM VÀO, LÀM SAO ĐỂ CÁC CÂU TRẢ LỜI TÔI NGẮN NHẤT CÓ THỂ, BỎ ĐI CÁC CHỮ KHÔNG LIÊN QUAN ĐẾN CÂU HỎI VÀ CÂU TRẢ LỜI.
-VÍ DỤ CÁC CÂU HỎI PHẢI HOẶC KHÔNG PHẢI THÌ CÂU TRẢ LỜI CHỈ NÊN LÀ KHÔNG HOẶC LÀ PHẢI, BỎ ĐI CÁC CÂU HỎI PHẢI TRẢ LỜI VÌ SAO, MỘT CÂU TRẢ LỜI MÀ CÁC CHỮ CÁI TRONG ĐÓ ĐỀU CÓ DẤU THÌ XIN BẠN HÃY BỎ DẤU ĐI CHUYỂN THÀNH KHÔNG DẤU HẾT
+    response = model.generate_content(f"""
+Lưu ý dành riêng cho học sinh khiếm thị:
 
+Các câu hỏi chỉ liên quan đến tính toán, không bao gồm lý thuyết hay tự luận dài dòng.
+Chủ đề bài tập thuộc chương {chapter} trong sách Toán 6 hoặc các lớp Toán 7, Toán 8, Toán 9 thuộc bộ sách "Chân Trời Sáng Tạo" của Bộ Giáo dục Việt Nam.
+Bài tập được xây dựng với định dạng rõ ràng, dễ hiểu, phù hợp với học sinh khiếm thị.
+Định dạng yêu cầu:
+
+Các câu hỏi và câu trả lời phải được phân cách bằng ký tự | với khoảng cách nhỏ ở hai bên.
+Không sử dụng ký tự | ở nơi khác ngoại trừ phân cách giữa câu hỏi và câu trả lời.
+Các ký tự toán học (cộng, trừ, nhân, chia) được viết dưới dạng chữ để đảm bảo học sinh dễ hiểu.
+Câu trả lời bằng số giữ nguyên định dạng số (không đổi thành chữ).
+Yêu cầu cụ thể:
+
+Tạo {soluong} bài tập liên quan đến tính toán, không bao gồm lý thuyết hay giải thích dài dòng.
+Độ khó bài tập: {dokho} (dễ hoặc trung bình).
+Tránh các câu hỏi yêu cầu giải thích "tại sao" hoặc yêu cầu liệt kê.
+Câu trả lời cần ngắn gọn, chính xác, không bao gồm dấu câu trong câu trả lời.
+Không sử dụng tiêu đề như "Bài 1", chỉ trả về câu hỏi và câu trả lời đúng theo định dạng.
+Ví dụ:
+
+Question: Ba cộng bảy bằng bao nhiêu | Answer: 10
+Question: Mười hai trừ năm bằng bao nhiêu | Answer: 7
+Lưu ý đặc biệt:
+
+Bài tập phải bám sát chương {chapter} trong sách và tránh các câu quá phức tạp.
+Tối ưu độ rõ ràng, dễ hiểu để phù hợp với học sinh khiếm thị.
+Kiểm tra kỹ câu trả lời trước khi trả về, đảm bảo mọi câu trả lời chính xác và khớp với câu hỏi.
+Hãy tạo bài tập một cách nhanh chóng và hiệu quả!
 """)
     
 
@@ -34,7 +54,7 @@ VÍ DỤ CÁC CÂU HỎI PHẢI HOẶC KHÔNG PHẢI THÌ CÂU TRẢ LỜI CHỈ
                 question = question.replace("Question:", "").strip()
                 answer = answer.strip().replace("Answer:", "").lower().strip()
                 print(chapter, question, answer)
-                db.insert_new_question(chapter, question, answer)
+                db.insert_new_question(chapter, question, answer, dokho)
             except ValueError as e:
                 print(f"Lỗi tách câu hỏi và câu trả lời: {e}")
         else:

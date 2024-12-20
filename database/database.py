@@ -132,19 +132,23 @@ def reset_single_user(username):
     )
     if result.matched_count == 0:
         return {'error': 'User not found'}, 404
-    return "User data reset successfully", 200
+    return 200
 
 def reset_all_user():
     leaderboard_collection.update_many({},
         {"$set": {"user_score": 0, "user_correct": 0, "user_fail": 0, "rank": ""}}
     )
-    return "Reset all data successfully", 200
+    return 200
 
 def insert_new_lecture(name, content):
     lectures_collection.insert_one({"name": name, "content": content})
 
 def find_lecture_by_name(name):
     return lectures_collection.find_one({"name": name})
+
+def remove_lecture_by_name(name):
+    lectures_collection.delete_one({"name": name})
+    return 200
 
 def find_all_lecture():
     return lectures_collection.find()
@@ -172,26 +176,38 @@ def sort_leaderboard():
         "Trung Binh": 3
     }
 
-    if len(list(leaderboard_collection.find())) == 0:
+    leaderboard_data = list(leaderboard_collection.find())
+
+    if len(leaderboard_data) == 0:
         return []
 
     sorted_data = sorted(
-        list(leaderboard_collection.find()),
+        leaderboard_data,
         key=lambda x: (rank_priority.get(x['rank'], 4), -x['user_score'])
     )
     return sorted_data
 
+
 def get_all_questions_by_chapter(chapter):
     return list(questions_collection.find({"chapter": chapter}))
 
+def get_questions_by_difficulty(chapter=None, difficulty=None):
+    query = {}
+    if chapter:
+        query["chapter"] = chapter
+    if difficulty:
+        query["difficulty"] = difficulty
 
-def insert_new_question(chapter, question, answer):
+    return list(questions_collection.find(query, {"_id": 0}))
+
+def insert_new_question(chapter, question, answer, dokho):
     # if not chapter or not question or not answer:
     #     return 300
     questions_collection.insert_one({
         "chapter" : chapter,
         "question" : question,
         "answer" : answer,
+        "difficulty": dokho
     })
 
     return 200
@@ -199,5 +215,6 @@ def insert_new_question(chapter, question, answer):
 def get_all_chapter():
     return questions_collection.distinct("chapter")
 
-def reset_pratice_chapter(chapter): 
+def reset_practice_chapter(chapter): 
+    # Xóa câu hỏi theo chương và độ khó
     questions_collection.delete_many({"chapter": chapter})

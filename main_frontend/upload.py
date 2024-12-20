@@ -11,12 +11,17 @@ import database.database as db
 
 
 class DragDropWidget(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, main_window):
         super().__init__()
+        self.main_window = main_window
         self.setAcceptDrops(True)
         self.init_ui()
 
     def init_ui(self):
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setWindowState(QtCore.Qt.WindowFullScreen)
+        self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowTitle("Tải Bài Giảng")
         self.setGeometry(100, 100, 800, 600)
         self.setStyleSheet("""
@@ -27,6 +32,7 @@ class DragDropWidget(QtWidgets.QWidget):
         """)
 
         self.label = QtWidgets.QLabel("Kéo và thả file bài giảng vào đây", self)
+        self.label.enterEvent = lambda event: speak("Đây là phần kéo thả bài tập vào đây") 
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setStyleSheet("""
             font-size: 20px;
@@ -42,8 +48,9 @@ class DragDropWidget(QtWidgets.QWidget):
             background-color: rgb(85, 170, 255); 
             border-radius: 10px; 
         """)
-        self.back_button.clicked.connect(self.go_back)
+        self.back_button.clicked.connect(lambda: self.go_back())
 
+        self.back_button.enterEvent = lambda event: speak("Đây là nút quay lại") 
         self.setLayout(QtWidgets.QVBoxLayout())
         self.layout().addWidget(self.label)
         self.layout().addWidget(self.back_button)
@@ -63,23 +70,22 @@ class DragDropWidget(QtWidgets.QWidget):
         name = file_path_list[-1]
         name = name[:-4]
 
-        with open(resource_path(file_path), 'r') as f: 
+        with open(resource_path(file_path), 'r', encoding="utf8") as f: 
             db.insert_new_lecture(name, f.read())
             speak("Bài giảng đã được tải lên thành công")
 
 
     def go_back(self):
-        self.label.setText("Quay về menu chính!")
-
+        from ui import Ui_Qdialog
+        self.dialog = QtWidgets.QDialog()  
+        self.ui = Ui_Qdialog() 
+        self.ui.setupUi(self.dialog)  
+        self.dialog.show() 
+        self.hide() 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Menu Tải Bài Giảng")
         self.setGeometry(100, 100, 800, 600)
-        self.setCentralWidget(DragDropWidget())
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
-    sys.exit(app.exec_())
+        self.drag_drop_widget = DragDropWidget(self) 
+        self.setCentralWidget(self.drag_drop_widget)

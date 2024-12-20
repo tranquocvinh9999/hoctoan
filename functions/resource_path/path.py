@@ -3,11 +3,14 @@ import sys
 
 def resource_path(relative_path):
     """Lấy đường dẫn tuyệt đối tới tài nguyên, hoạt động cả khi đóng gói."""
-    try:
-        # Khi chạy dưới dạng tệp .exe, PyInstaller trích xuất tệp vào _MEIxxx
-        base_path = sys._MEIPASS
-    except AttributeError:
-        # Khi chạy trong môi trường phát triển
-        base_path = os.path.abspath(".")
-
+    if getattr(sys, 'frozen', False):
+            # If the app is frozen (compiled executable)
+        base_path = os.path.dirname(sys.executable)
+    else:
+            # If running as a script (not frozen)
+        base_path = "./"
+    print(base_path)
+    print(relative_path)
     return os.path.join(base_path, relative_path)
+
+
